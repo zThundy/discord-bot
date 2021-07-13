@@ -1,0 +1,22 @@
+{
+  "name": "bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "fs": "0.0.1-security",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.7",
+    "npm": "^6.14.11",
+    "opusscript": "0.0.7",
+    "ytdl-core": "^4.4.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "dev": "nodemon main.js"
+  },
+  "type": "module",
+  "author": "",
+  "license": "ISC"
+}
