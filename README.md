@@ -27,7 +27,7 @@ npm run dev
 ```
 
 ## Addon
-If you want to search songs from spotify, just go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/login), create your own application and use the credential on the application page
+If you want to search songs from spotify, just go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/login), create your own application and use the credential on the application page and change them in the `config.js` as shown down here:
 ```js
 ...
     spotify: {
