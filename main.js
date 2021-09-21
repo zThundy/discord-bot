@@ -1,38 +1,27 @@
 import Discord from "discord.js";
-import mysql from "mysql";
-import { init } from "./commands/init.js"
-import config from "./config.js"
+import MySQL from "./mysql.js";
+import Colors from "./colors.js";
+import { init } from "./commands/init.js";
+import config from "./config.js";
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 client.login(config.token);
 
-var con = mysql.createConnection({
-    host: config.database.host,
-    user: config.database.user,
-    database: config.database.database,
-    password: config.database.password
-});
+const mysql = new MySQL(config.database);
+global.con = mysql.getConnection();
 
-con.connect(err => {
-    if (err) console.log(err);
-    console.log("Connessione al database stabilita!");
-});
-
-con.on("error", err => {
-    if (err) console.log(err);
-    con = mysql.createConnection({
-        host: config.database.host,
-        user: config.database.user,
-        database: config.database.database,
-        password: config.database.password
-    });
-    global.con = con;
-})
-
-global.con = con;
+const colors = new Colors();
 
 client.on("ready", () => {
-    console.log("Bot ready :)");
-    init(client, config)
+    console.log(colors.changeBackground("green", "Bot authed successfully :)"));
+    init(client, config);
+});
+
+client.on('shardError', (error) => {
+	console.error(colors.changeBackground("red", "Error on connecting to discord: " + error));
+});
+
+client.on('unhandledRejection', error => {
+	console.error(colors.changeBackground("red", "Error on connecting to discord: " + error));
 });
