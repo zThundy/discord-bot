@@ -117,6 +117,10 @@ export default {
                 {
                     name: "youtube-link",
                     description: "Adding this argument the bot will join (if not already) to your channel and will start the song playback of the given youtube link"
+                },
+                {
+                    name: "video title",
+                    description: "Adding this argument the bot will join (if not already) to your channel and will start the playback of the first result of a youtube search"
                 }
             ]
         },
