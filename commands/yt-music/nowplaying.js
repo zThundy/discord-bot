@@ -1,17 +1,18 @@
 import { MessageEmbed } from "discord.js";
-import { GetCurrentSong } from "./engine.js";
+import { GetCurrentSong, IsCurrentSongLooping } from "./engine.js";
 import { FormatNumber } from "./../../utils.js";
 
 export async function run(client, args, message) {
-    let song = await GetCurrentSong(message)
+    let song = await GetCurrentSong(message);
+    let looping = await IsCurrentSongLooping(message);
 
     // check if something is playing
     if (song.length == 0) {
         let embed = new MessageEmbed()
             .setDescription("No song playing rn 😔")
-            .setColor("#FF0000")
-        message.channel.send({ embed })
-        return
+            .setColor("#FF0000");
+        message.channel.send({ embed });
+        return;
     }
 
     let embed = new MessageEmbed()
@@ -38,12 +39,12 @@ export async function run(client, args, message) {
                 inline: true
             },
             {
-                name: "Link",
-                value: "[Youtube Link](" + song.video_url + ")",
-                inline: true
+                name: "Looping",
+                value: looping ? "✅" : "❌",
+                inline: true 
             }
         ])
         .setThumbnail(song.author.thumbnails[0].url)
-
-    message.channel.send({ embed })
+        .setDescription("[Youtube Link](" + song.video_url + ")");
+    message.channel.send({ embed });
 }
