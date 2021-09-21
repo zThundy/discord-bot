@@ -88,10 +88,18 @@ function PlayFirstSong(message, link, song) {
             .setColor("#00FF00")
         queue[message.guild.id].textChannel.send({ embed })
     } else {
-        let embed = new MessageEmbed()
-            .setDescription(`Song queued 🥳`)
-            .setColor("#00FF00")
-        queue[message.guild.id].textChannel.send({ embed })
+        let last_song = queue[message.guild.id].songs.at(-1)
+        if (last_song) {
+            let embed = new MessageEmbed()
+                .setDescription(`**${last_song.title}** queued 🥳`)
+                .setColor("#00FF00")
+            queue[message.guild.id].textChannel.send({ embed })
+        } else {
+            let embed = new MessageEmbed()
+                .setDescription(`Song queued 🥳`)
+                .setColor("#00FF00")
+            queue[message.guild.id].textChannel.send({ embed })
+        }
     }
 }
 
