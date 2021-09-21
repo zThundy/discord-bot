@@ -108,7 +108,7 @@ export async function init(client, config) {
 
     client.on("guildCreate", (guild) => {
         global.con.query(`INSERT INTO servers(id) VALUES(${guild.id})`, (err, result) => {
-            if (err) throw err;
+             if (err) console.error(err);
             paths.forEach(async file => {
                 let command = file.module;
                 let prop = client.commands.get(command);
@@ -119,7 +119,7 @@ export async function init(client, config) {
 
     client.on("guildDelete", (guild) => {
         global.con.query(`DELETE FROM servers WHERE id = '${guild.id}'`, (err, result) => {
-            if (err) throw err;
+             if (err) console.error(err);
         })
     });
 

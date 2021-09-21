@@ -15,7 +15,7 @@ export async function run(client, args, message) {
         currency[message.guild.id][message.author.id] = config.currency.enableDefaultCurrency ? config.currency.defaultCurrency : 0
 
         global.con.query(`INSERT INTO slot(guild, user, currency) VALUES(${message.guild.id}, ${message.author.id}, ${currency[message.guild.id][message.author.id]})`, (err, result) => {
-            if (err) throw err;
+             if (err) console.error(err);
         })
     }
 
@@ -40,7 +40,7 @@ export async function run(client, args, message) {
             slotChannels[message.guild.id] = message.channel.id
 
             global.con.query(`UPDATE servers SET slotChannelId = ${message.channel.id} WHERE id = ${message.guild.id}`, (err, result) => {
-                if (err) throw err;
+                 if (err) console.error(err);
             })
 
             let embed = new MessageEmbed()
@@ -95,7 +95,7 @@ export async function run(client, args, message) {
                 currency[message.guild.id][userID] = config.currency.enableDefaultCurrency ? config.currency.defaultCurrency : 0
                 currency[message.guild.id][userID] += Number(args[3])
                 global.con.query(`INSERT INTO slot(guild, user, currency) VALUES(${message.guild.id}, ${userID}, ${currency[message.guild.id][userID]})`, (err, result) => {
-                    if (err) throw err;
+                     if (err) console.error(err);
                 })
             } else {
                 currency[message.guild.id][userID] += Number(args[3])
@@ -112,7 +112,7 @@ export async function run(client, args, message) {
             if (!rolling[message.guild.id]) {
                 if (args[1] == "daily") {
                     global.con.query(`SELECT lastDaily FROM slot WHERE guild = ${message.guild.id} AND user = ${message.author.id}`, (err, result) => {
-                        if (err) throw err;
+                         if (err) console.error(err);
 
                         if ((!dailyRoll[message.guild.id] || !dailyRoll[message.guild.id][message.author.id]) || Math.floor(((new Date() - dailyRoll[message.guild.id][message.author.id]) / 1000) / (24 * 60 * 60)) > 0) {
                             if (!dailyRoll[message.guild.id]) dailyRoll[message.guild.id] = {}
@@ -123,7 +123,7 @@ export async function run(client, args, message) {
                             }
 
                             global.con.query(`UPDATE slot SET lastDaily = '${FormatToMysql(dailyRoll[message.guild.id][message.author.id])}' WHERE guild = ${message.guild.id} AND user = ${message.author.id}`, (err, result) => {
-                                if (err) throw err;
+                                 if (err) console.error(err);
                             })
 
                             StartSlot(message, message.author.id, 10)
@@ -174,7 +174,7 @@ export async function run(client, args, message) {
 
 export async function init(client) {
     global.con.query(`SELECT * FROM slot`, (err, result) => {
-        if (err) throw err;
+         if (err) console.error(err);
 
         for (var i in result) {
             if (!currency[result[i].guild])
@@ -190,7 +190,7 @@ export async function init(client) {
     })
 
     global.con.query(`SELECT * FROM servers`, (err, result) => {
-        if (err) throw err;
+         if (err) console.error(err);
 
         for (var i in result) {
             if (result[i].slotChannelId) {
@@ -431,7 +431,7 @@ function StartAnimation(message, userID, amount, winString, winAmount) {
 
 function SaveMyCurrency(message, userID) {
     global.con.query(`UPDATE slot SET currency = ${currency[message.guild.id][userID]} WHERE guild = ${message.guild.id} AND user = ${userID}`, (err, result) => {
-        if (err) throw err;
+         if (err) console.error(err);
     })
 }
 

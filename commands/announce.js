@@ -13,11 +13,11 @@ export async function run(client, args, message) {
 
         if (cachedChannels[message.guild.id]) {
             global.con.query(`UPDATE announces SET channelId = '${message.channel.id}' WHERE guild = '${message.guild.id}'`, (err, result) => {
-                if (err) throw err;
+                if (err) console.error(err);
             });
         } else {
             global.con.query(`INSERT INTO announces(guild, channelId) VALUES(${message.guild.id}, ${message.channel.id})`, (err, result) => {
-                if (err) throw err;
+                if (err) console.error(err);
                 cachedChannels[message.guild.id] = message.channel.id;
             });
         }
@@ -26,7 +26,7 @@ export async function run(client, args, message) {
 
 export async function init(client) {
     global.con.query(`SELECT * FROM announces`, (err, result) => {
-        if (err) throw err;
+        if (err) console.error(err);
         for (var i in result) {
             cachedChannels[result[i].guild] = result[i].channelId;
             client.channels.fetch(result[i].channelId, true);

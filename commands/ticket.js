@@ -46,7 +46,7 @@ export async function reactionAdd(client, reactionMessage, user) {
             ticketsCategory[guildId] = channel.id
 
             global.con.query(`UPDATE servers SET ticketCategoryId = ${channel.id} WHERE id = ${guildId}`, (err, result) => {
-                if (err) throw err;
+                 if (err) console.error(err);
             })
         }
 
@@ -78,7 +78,7 @@ export async function reactionAdd(client, reactionMessage, user) {
                 message.react("✅")
 
                 global.con.query(`INSERT INTO tickets(guild, channelId, headerMessId, ticketId) VALUES(${guildId}, ${channel.id}, ${message.id}, ${ticketIds[guildId]})`, (err, result) => {
-                    if (err) throw err;
+                     if (err) console.error(err);
                     if (!openedTickets[guildId]) openedTickets[guildId] = {};
                     openedTickets[guildId][ticketIds[guildId]] = channel.id
                 });
@@ -86,7 +86,7 @@ export async function reactionAdd(client, reactionMessage, user) {
         });
 
         global.con.query(`UPDATE servers SET lastTicketId = '${ticketIds[guildId]}' WHERE id = '${guildId}'`, (err, result) => {
-            if (err) throw err;
+             if (err) console.error(err);
         });
     }
 }
@@ -97,7 +97,7 @@ const deleteTicket = async (message) => {
 
     if (openedTickets[message.guild.id][ticketId] == message.channel.id) {
         global.con.query(`DELETE FROM tickets WHERE guild = ${message.guild.id} AND channelId = ${message.channel.id}`, (err, result) => {
-            if (err) throw err;
+             if (err) console.error(err);
         });
 
         delete openedTickets[message.guild.id][ticketId]
@@ -124,7 +124,7 @@ export async function run(client, args, message) {
         message.channel.send({ embed }).then(msg => {
             msg.react('🎫').then(() => {
                 global.con.query(`UPDATE servers SET ticketMessId = '${msg.id}', ticketChanId = '${msg.channel.id}' WHERE id = '${message.guild.id}'`, (err, result) => {
-                    if (err) throw err;
+                     if (err) console.error(err);
                     messageIds[message.guild.id] = msg.id
                     ticketIds[message.guild.id] = 0
                 })
@@ -137,7 +137,7 @@ export async function run(client, args, message) {
 
 export async function init(client) {
     global.con.query(`SELECT * FROM servers`, (err, result) => {
-        if (err) throw err;
+         if (err) console.error(err);
 
         try {
             for (var i in result) {
@@ -157,7 +157,7 @@ export async function init(client) {
     })
     
     global.con.query(`SELECT * FROM tickets`, (err, result) => {
-        if (err) throw err;
+         if (err) console.error(err);
 
         for (var i in result) {
             if (!openedTickets[result[i].guild]) openedTickets[result[i].guild] = {};
