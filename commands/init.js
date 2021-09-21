@@ -6,9 +6,7 @@ let timeouts = {};
 
 export function GetCommands() { return paths; }
 
-export function RemoveFromPath(path) {
-    paths = paths.filter(filterPath => filterPath.path != path)
-}
+export function RemoveFromPath(path) { paths = paths.filter(filterPath => filterPath.path != path) }
 
 export function GetCommand(command) { return paths.filter(path => path.module == command) }
 
@@ -60,9 +58,7 @@ export async function init(client, config) {
                     }
                     // timeout check per guild
                     if (!timeouts[message.guild.id]) timeouts[message.guild.id] = true;
-                    setTimeout(() => {
-                        delete timeouts[message.guild.id];
-                    }, config.musicPlayer.timeBetweenCommands * 1000);
+                    setTimeout(() => { delete timeouts[message.guild.id]; }, config.musicPlayer.timeBetweenCommands * 1000);
                 }
                 // main funzion trigger
                 prop.run(client, args, message);
