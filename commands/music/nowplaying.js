@@ -4,10 +4,8 @@ import { FormatNumber } from "./../../utils.js";
 
 export async function run(client, args, message) {
     let song = await GetCurrentSong(message)
-    // console.log(song.author.thumbnails)
 
     // check if something is playing
-    // console.log(song)
     if (song.length == 0) {
         let embed = new MessageEmbed()
             .setDescription("No song playing rn 😔")
@@ -45,7 +43,3 @@ export async function run(client, args, message) {
 
     message.channel.send({ embed })
 }
-
-// export async function init(client) {
-//     console.log("init")
-// }
