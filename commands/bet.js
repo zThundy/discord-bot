@@ -22,9 +22,9 @@ export async function run(client, args, message) {
     if (!slotChannels[message.guild.id] && args[1] != "setup") {
         let embed = new MessageEmbed()
             .setColor("#FF0000")
-            .setDescription(`Please setup a slot channel first: *${config.prefix}bet setup* 📣`)
-        message.channel.send({ embed })
-        return
+            .setDescription(`Please setup a slot channel first: *${config.prefix}bet setup* 📣`);
+        message.channel.send({ embed });
+        return;
     }
 
     if (args[1]) {
@@ -32,9 +32,9 @@ export async function run(client, args, message) {
             if (!message.member.hasPermission("ADMINISTRATOR")) {
                 let embed = new MessageEmbed()
                     .setColor("#FF0000")
-                    .setDescription("You do not have admin privileges 🚫")
-                message.channel.send({ embed })
-                return
+                    .setDescription("You do not have admin privileges 🚫");
+                message.channel.send({ embed });
+                return;
             }
 
             slotChannels[message.guild.id] = message.channel.id
@@ -45,26 +45,26 @@ export async function run(client, args, message) {
 
             let embed = new MessageEmbed()
                 .setColor("#00FF00")
-                .setDescription("Setup completed ✅")
-            message.channel.send({ embed })
-            return
+                .setDescription("Setup completed ✅");
+            message.channel.send({ embed });
+            return;
         }
 
         if (args[1] == "give") {
-            let userID = 0
-            let mentionedUser = message.mentions.users.first()
+            let userID = 0;
+            let mentionedUser = message.mentions.users.first();
             if (!mentionedUser) {
                 if (args[2] == "me") {
-                    userID = message.author.id
+                    userID = message.author.id;
                 } else {
                     let embed = new MessageEmbed()
                         .setColor("#FF0000")
-                        .setDescription("Please tag a user or use `me` instead 📋")
-                    message.channel.send({ embed })
-                    return
+                        .setDescription("Please tag a user or use `me` instead 📋");
+                    message.channel.send({ embed });
+                    return;
                 }
             } else {
-                userID = mentionedUser.id
+                userID = mentionedUser.id;
             }
 
             if (!message.member.hasPermission("ADMINISTRATOR")) {

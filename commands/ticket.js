@@ -96,7 +96,6 @@ const deleteTicket = async (message) => {
     let ticketId = message.channel.name.split("-")[1]
 
     if (openedTickets[message.guild.id][ticketId] == message.channel.id) {
-
         global.con.query(`DELETE FROM tickets WHERE guild = ${message.guild.id} AND channelId = ${message.channel.id}`, (err, result) => {
             if (err) throw err;
         });
