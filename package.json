@@ -11,6 +11,7 @@
     "nodemon": "^2.0.7",
     "npm": "^6.14.11",
     "opusscript": "0.0.7",
+    "request-promise": "^4.2.6",
     "ytdl-core": "^4.9.1",
     "ytsr": "^3.5.3"
   },

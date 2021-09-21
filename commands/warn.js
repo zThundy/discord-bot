@@ -36,7 +36,7 @@ export async function run(client, args, message) {
         warnedUsers[guildMember.id][lastWarnId] = reason
 
         global.con.query(`INSERT INTO warns(user, warnid, reason) VALUES(${guildMember.id}, ${lastWarnId}, '${reason}')`, (err, result) => {
-            if (err) throw err;
+             if (err) console.error(err);
 
             if (lastWarnId >= config.warn.role1.assignOn) {
                 // console.log("ruolo 1")
@@ -64,7 +64,7 @@ export async function run(client, args, message) {
 
 export async function init(client) {
     global.con.query(`SELECT * FROM warns`, (err, result) => {
-        if (err) throw err;
+         if (err) console.error(err);
         for (var i in result) {
             if (!warnedUsers[result[i].user]) warnedUsers[result[i].user] = {};
             warnedUsers[result[i].user][result[i].warnid] = result[i].reason
