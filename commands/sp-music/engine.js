@@ -8,36 +8,28 @@ const spotify = new Spotify(config.spotify);
 
 export async function SearchSongName(client, args, message, voiceChannel) {
     try {
-        let songInfo = null;
+        let songInfo = "";
         let tmp_args = [...args];
         if (tmp_args[1].indexOf("http") === -1) {
-            let string = ""
-            tmp_args.shift()
+            let string;
+            tmp_args.shift();
             for (var i in tmp_args) { string += tmp_args[i] + " "; }
-            songInfo = await spotify.searchTrack(string)[0];
+            songInfo = await spotify.searchTrack(string);
+            songInfo = songInfo[0];
         } else {
-            // if (tmp_args[1].includes("track")) {
-            //     console.log("searching single song")
+            if (!(args[1].includes("spotify") || args[1].includes("open.spotify"))) return console.error("Spotify link invalid");
             songInfo = await spotify.getTrackByURL(args[1]);
-            // } else if (tmp_args[1].includes("playlist")) {
-            //     let elements = await spotify.getPlaylistByURL(tmp_args[1]);
-            //     elements.tracks.items.forEach(element => {
-            //         if (!queue[message.guild.id]) queue[message.guild.id] = [];
-            //         queue[message.guild.id].push({ name: element.name, artist: element.artists[0].name })
-            //     });
-            //     console.log(queue[message.guild.id])
-            // }
         }
         if (songInfo.artists)
-            args = [args[0], songInfo.name, songInfo.artists[0].name]
+            args = [args[0], songInfo.name, songInfo.artists[0].name];
         else
-            args = [args[0], songInfo.name]
-        QueueSong(client, args, message, voiceChannel)
+            args = [args[0], songInfo.name];
+        QueueSong(client, args, message, voiceChannel);
     } catch (e) {
         console.error(e)
         let embed = new MessageEmbed()
             .setDescription("No song found on spotify ☹️")
-            .setColor("#FF0000")
-        message.channel.send({ embed })
+            .setColor("#FF0000");
+        message.channel.send({ embed });
     }
 }
