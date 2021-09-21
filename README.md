@@ -26,5 +26,15 @@ I suggest you tu use nodemon to run the bot if you need to edit the file and res
 npm run dev
 ```
 
+## Addon
+If you want to search songs from spotify, just go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/login), create your own application and use the credential on the application page
+```js
+...
+    spotify: {
+        clientId: "YOUR_SPOTIFY_CLIENT_ID_HERE",
+        secret: "YOUR_SPOTIFY_SECRET_HERE"
+    },
+...
+```
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
