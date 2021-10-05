@@ -1,5 +1,4 @@
 import { MessageEmbed } from "discord.js";
-import config from "./../config.js";
 
 let cachedChannels = {};
 

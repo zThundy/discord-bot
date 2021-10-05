@@ -1,5 +1,5 @@
 import { MessageEmbed } from "discord.js";
-import { SkipCurrentSong } from "./engine.js";
+import { SkipCurrentSong } from "./yt-engine.js";
 import config from "./../../config.js";
 
 let timeouts = {};

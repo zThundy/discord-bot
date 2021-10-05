@@ -1,4 +1,3 @@
-import { MessageEmbed } from "discord.js";
 import config from "./../config.js";
 
 let fields = []
@@ -24,48 +23,20 @@ export async function run(client, args, message) {
         embed = {
             color: "#000000",
             title: 'Arguments list',
-            // url: 'https://discord.js.org',
-            // author: {
-            //     name: 'Some name',
-            //     icon_url: 'https://i.imgur.com/wSTFkRM.png',
-            //     url: 'https://discord.js.org',
-            // },
             description: 'Possible arguments for command ' + config.prefix + args[1],
-            // thumbnail: {
-            //     url: 'https://i.imgur.com/wSTFkRM.png',
-            // },
             fields: argsFields,
-            // image: {
-            //     url: 'https://i.imgur.com/wSTFkRM.png',
-            // },
-            // timestamp: new Date(),
             footer: {
                 text: 'Made with ❤️ by zThundy__',
-                // icon_url: 'https://i.imgur.com/wSTFkRM.png',
             },
         }
     } else {
         embed = {
             color: "#000000",
             title: 'Commands list',
-            // url: 'https://discord.js.org',
-            // author: {
-            //     name: 'Some name',
-            //     icon_url: 'https://i.imgur.com/wSTFkRM.png',
-            //     url: 'https://discord.js.org',
-            // },
             description: 'This is a list of all existing commands',
-            // thumbnail: {
-            //     url: 'https://i.imgur.com/wSTFkRM.png',
-            // },
             fields: fields,
-            // image: {
-            //     url: 'https://i.imgur.com/wSTFkRM.png',
-            // },
-            // timestamp: new Date(),
             footer: {
                 text: 'Made with ❤️ by zThundy__',
-                // icon_url: 'https://i.imgur.com/wSTFkRM.png',
             },
         }
     }

@@ -29,7 +29,7 @@ class MySQLClass {
                 console.log(colors.changeColor("green", "Connection to database enstablished successfully"));
             }
         });
-        this.connection.on("err", (err) => {
+        this.connection.on("error", (err) => {
             if (err) console.error(colors.changeColor("red", "Got error while connected to database: " + err));
             console.log(colors.changeColor("yellow", "Retrying connection in 5 seconds..."));
             setTimeout(() => { this.connect(); }, 5000);
