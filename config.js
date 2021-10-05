@@ -1,5 +1,5 @@
 export default {
-    token: "ODA2OTI5Mzk0NjA1MDk3MDAx.YBwljw.p7wl7dJu_A44WCAxLqVYSFh0fds",
+    token: "YOUR_DISCORD_TOKEN_HERE",
     prefix: "!!",
     database: {
         host: "localhost",
@@ -8,8 +8,8 @@ export default {
         database: "bot"
     },
     spotify: {
-        clientId: "4233862fa0ae473a88e1161ec3a0f2e5",
-        secret: "7811f779fe13483596b41dec27435438"
+        clientId: "YOUR_SPOTIFY_ID_HERE",
+        secret: "YOUR_SPOTIFY_SECRET_HERE"
     },
     warn: {
         role1: {
