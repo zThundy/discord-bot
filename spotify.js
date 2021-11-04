@@ -9,10 +9,14 @@ class SpotifyClass {
             return console.error("You must specify a Spotify Secret!");
         this.authOptions = {
             url: "https://accounts.spotify.com/api/token",
-            headers: { Authorization: `Basic ${btoa(config.clientId + ":" + config.secret)}` },
+            headers: { Authorization: `Basic ${this.fromBase64(config.clientId + ":" + config.secret)}` },
             form: { grant_type: "client_credentials" },
             json: true,
         };
+    }
+
+    fromBase64 (string) {
+        return Buffer.from(string, 'base64').toString();
     }
 
     async searchTrack(trackName, options = {}) {
