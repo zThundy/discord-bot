@@ -1,6 +1,6 @@
 # DiscordJs v-12.x bot
 
-This open source project is a node package made to have a personal discord bot to play slots, display join and quit messages, play music from youtube and more.
+This open source project is a node package made to have a personal discord bot to play music from youtube and spotify.
 
 ## Installation
 To install everything you need, you'll have to run the command
