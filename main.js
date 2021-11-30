@@ -1,5 +1,4 @@
 import Discord from "discord.js";
-import MySQL from "./mysql.js";
 import Colors from "./colors.js";
 import { init } from "./commands/init.js";
 import config from "./config.js";
@@ -8,9 +7,7 @@ const client = new Discord.Client();
 client.commands = new Discord.Collection();
 client.login(config.token);
 
-const mysql = new MySQL(config.database);
-global.con = mysql.getConnection();
-
+const database = new SQL();
 const colors = new Colors();
 
 client.on("ready", () => {

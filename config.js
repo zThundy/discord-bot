@@ -1,12 +1,6 @@
 export default {
     token: "YOUR_DISCORD_TOKEN_HERE",
     prefix: "!!",
-    database: {
-        host: "localhost",
-        user: "bot",
-        password: "discordbot",
-        database: "bot"
-    },
     spotify: {
         clientId: "YOUR_SPOTIFY_ID_HERE",
         secret: "YOUR_SPOTIFY_SECRET_HERE"

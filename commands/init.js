@@ -103,8 +103,7 @@ export async function init(client, config) {
     });
 
     client.on("guildCreate", (guild) => {
-        global.con.query(`INSERT INTO servers(id) VALUES(${guild.id})`, (err, result) => {
-             if (err) console.error(err);
+        client.database.execute(`INSERT INTO servers(id) VALUES(${guild.id})`, () => {
             paths.forEach(async file => {
                 let command = file.module;
                 let prop = client.commands.get(command);
@@ -114,9 +113,7 @@ export async function init(client, config) {
     });
 
     client.on("guildDelete", (guild) => {
-        global.con.query(`DELETE FROM servers WHERE id = '${guild.id}'`, (err, result) => {
-             if (err) console.error(err);
-        })
+        client.database.execute(`DELETE FROM servers WHERE id = '${guild.id}'`)
     });
 
     let status = `Online on ${client.guilds.cache.size} servers | ${config.prefix}help`;
