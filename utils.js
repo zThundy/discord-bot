@@ -18,8 +18,3 @@ export function FormatNumber (value) {
 export function FormatToMysql(time) {
     return new Date(time).toJSON().slice(0, 19).replace('T', ' ')
 }
-
-export function IsSpotifyPlaylist(url) {
-    if (url.includes("/playlist/")) return true;
-    return false;
-}

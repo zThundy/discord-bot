@@ -2,10 +2,9 @@ import config from "../../config.js";
 import Spotify from "../../spotify.js";
 import { MessageEmbed } from "discord.js";
 import { QueueSong } from "./../yt-music/yt-engine.js";
-import { IsSpotifyPlaylist } from "../../utils.js";
 
 const spotify = new Spotify(config.spotify);
-let queue = {};
+// let queue = {};
 
 export async function SearchSongName(client, args, message, voiceChannel) {
     try {
@@ -30,35 +29,6 @@ export async function SearchSongName(client, args, message, voiceChannel) {
         console.error(e)
         let embed = new MessageEmbed()
             .setDescription("No song found on spotify ☹️")
-            .setColor("#FF0000");
-        message.channel.send({ embed });
-    }
-}
-
-// https://open.spotify.com/playlist/1yDWXzzxuccGQ2jjcSWIQE?si=fa54d7c8b99c4d00
-export async function GetPlaylistSongs(client, args, message) {
-    try {
-        let errorMessage;
-        if (!args[1]) {
-            errorMessage = "Please specify a link 😒";
-        }
-        if (!errorMessage) {
-            if (IsSpotifyPlaylist(args[1])) {
-                const url = args[1];
-                const elements = url.split("/");
-                const id = elements[4].split("?")[0];
-                console.log(id);
-            }
-        } else {
-            let embed = new MessageEmbed()
-                .setDescription(errorMessage)
-                .setColor("#FF0000");
-            message.channel.send({ embed });
-        }
-    } catch (e) {
-        console.error(e)
-        let embed = new MessageEmbed()
-            .setDescription("No playlist found on spotify ☹️")
             .setColor("#FF0000");
         message.channel.send({ embed });
     }
