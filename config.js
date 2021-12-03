@@ -1,10 +1,9 @@
 export default {
-    token: "YOUR_DISCORD_TOKEN_HERE",
+    token: "ODA2OTI5Mzk0NjA1MDk3MDAx.YBwljw.fPPMPIYEnhGDeLfLCBlLgPySrfQ",
     prefix: "!!",
     spotify: {
-        clientId: "YOUR_SPOTIFY_ID_HERE",
-        secret: "YOUR_SPOTIFY_SECRET_HERE"
-    },
+        clientId: "4233862fa0ae473a88e1161ec3a0f2e5",
+        secret: "d3a4fdb1306947c6adba521ff3f2487f"
     },
     musicPlayer: {
         defaultVolume: 0.5,
