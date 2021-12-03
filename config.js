@@ -5,7 +5,6 @@ export default {
         clientId: "YOUR_SPOTIFY_ID_HERE",
         secret: "YOUR_SPOTIFY_SECRET_HERE"
     },
-    },
     musicPlayer: {
         defaultVolume: 0.5,
         timeBetweenCommands: 3, // in seconds
