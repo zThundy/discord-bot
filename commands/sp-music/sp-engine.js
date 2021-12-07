@@ -5,7 +5,18 @@ import { QueueSong } from "./../yt-music/yt-engine.js";
 import { IsSpotifyPlaylist } from "../../utils.js";
 
 const spotify = new Spotify(config.spotify);
-let queue = {};
+var buisy = false;
+
+function _ElaborateQueue(client, songs, message, voiceChannel) {
+    if (songs && songs.length > 0) {
+        const song = songs.shift();
+        console.log("Enqueuing", song)
+        QueueSong(client, song, message, voiceChannel);
+        setTimeout(() => { _ElaborateQueue(client, songs, message, voiceChannel); }, 10000)
+    } else {
+        buisy = false
+    };
+}
 
 export async function SearchSongName(client, args, message, voiceChannel) {
     try {
@@ -36,18 +47,33 @@ export async function SearchSongName(client, args, message, voiceChannel) {
 }
 
 // https://open.spotify.com/playlist/1yDWXzzxuccGQ2jjcSWIQE?si=fa54d7c8b99c4d00
-export async function GetPlaylistSongs(client, args, message) {
+export async function GetPlaylistSongs(client, args, message, voiceChannel) {
     try {
+        let songs = [];
         let errorMessage;
         if (!args[1]) {
             errorMessage = "Please specify a link 😒";
         }
+        if (buisy) {
+            errorMessage = "Please wait until the selected playlist is beeing elaborated 😒";
+        }
         if (!errorMessage) {
             if (IsSpotifyPlaylist(args[1])) {
+                buisy = true;
                 const url = args[1];
-                const elements = url.split("/");
-                const id = elements[4].split("?")[0];
-                console.log(id);
+                // const elements = url.split("/");
+                // const id = elements[4].split("?")[0];
+                // console.log(id);
+                const playlist = await spotify.getPlaylistByURL(url);
+                for (var i in playlist.tracks.items) {
+                    const songInfo = playlist.tracks.items[i].track;
+                    if (songInfo.artists)
+                        args = [args[0], songInfo.name, songInfo.artists[0].name];
+                    else
+                        args = [args[0], songInfo.name];
+                    songs.push(args);
+                }
+                _ElaborateQueue(client, songs, message, voiceChannel);
             }
         } else {
             let embed = new MessageEmbed()
