@@ -16,7 +16,7 @@ class SpotifyClass {
     }
 
     fromBase64 (string) {
-        return new Buffer(string).toString("base64");
+        return new Buffer.from(string).toString("base64");
     }
 
     async searchTrack(trackName, options = {}) {
