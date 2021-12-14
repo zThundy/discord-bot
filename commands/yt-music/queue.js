@@ -12,21 +12,17 @@ export async function run(client, args, message) {
 
 const CreateQueueMessage = async (client, args, message) => {
     let songs = await GetSongs(message)
-
     if (songs && songs[0]) {
         queueIndex[message.guild.id] = 1;
-
         let description = GetQueueDescription(songs, queueIndex[message.guild.id], (config.musicPlayer.queueMaxView - 1) + queueIndex[message.guild.id]);
         let embed = new MessageEmbed()
             .setTitle("Queue for " + message.guild.name)
             .setDescription("```" + description + "```");
-
         message.channel.send({ embed }).then(msg => {
             if (songs.length < config.musicPlayer.queueMaxView) {
                 queueMessages[message.guild.id] = msg;
                 return;
             };
-
             msg.react("⏪").then(() => {
                 msg.react("◀️").then(() => {
                     msg.react("▶️").then(() => {
@@ -88,9 +84,9 @@ const GetQueueDescription = (songs, minIndex, maxIndex) => {
     for (var i in songs) {
         if ((Number(i) + 1) <= maxIndex && (Number(i) + 1) >= minIndex) {
             if (songs[i].allowRatings) {
-                description += `[${(Number(i) + 1)}] ${songs[i].title} - ${FormatNumber(songs[i].likes)} 👍 | ${FormatNumber(songs[i].dislikes)} 👎\n`;
+                description += `[${(Number(i) + 1)}] ${songs[i].title} - ${FormatNumber(songs[i].likes)} 👍\n`;
             } else {
-                description += `[${(Number(i) + 1)}] ${songs[i].title} - No 👍 or 👎 😢\n`;
+                description += `[${(Number(i) + 1)}] ${songs[i].title} - No 👍 😢\n`;
             }
         }
     }
