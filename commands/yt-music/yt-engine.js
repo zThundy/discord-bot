@@ -6,17 +6,19 @@ import fs from "fs";
 
 let queue = {};
 
-export async function QueueSong(client, args, message, voiceChannel) {
+export async function QueueSong(client, args, message, voiceChannel, showMessage) {
     try {
         let songInfo;
         if (args[1].indexOf("http") === -1) {
             let string = "";
             args.shift();
             for (var i in args) { string += args[i] + " "; }
-            let embed = new MessageEmbed()
-                .setDescription("Searching **" + string + "** 🧐")
-                .setColor("#FF0000");
-            message.channel.send({ embed });
+            if (showMessage) {
+                let embed = new MessageEmbed()
+                    .setDescription("Searching **" + string + "** 🧐")
+                    .setColor("#FF0000");
+                message.channel.send({ embed });
+            }
             const searchResults = await ytsr(string, { limit: 1 });
             if (searchResults && searchResults.items)
                 if (searchResults.items[0].url)
@@ -34,17 +36,19 @@ export async function QueueSong(client, args, message, voiceChannel) {
         queue[message.guild.id].loop = false;
         queue[message.guild.id].volume = config.musicPlayer.defaultVolume;
 
-        FetchFirstSong(message);
+        FetchFirstSong(message, showMessage);
     } catch (e) {
         console.error(e);
-        let embed = new MessageEmbed()
-            .setDescription("No video found ☹️")
-            .setColor("#FF0000");
-        message.channel.send({ embed });
+        if (showMessage) {
+            let embed = new MessageEmbed()
+                .setDescription("No video found ☹️")
+                .setColor("#FF0000");
+            message.channel.send({ embed });
+        }
     }
 }
 
-function PlayFirstSong(message, link, song) {
+function PlayFirstSong(message, link, song, showMessage) {
     if (!queue[message.guild.id].nowplaying) {
         queue[message.guild.id].nowplaying = song
         queue[message.guild.id].dispatcher = queue[message.guild.id].connection
@@ -54,44 +58,50 @@ function PlayFirstSong(message, link, song) {
                     queue[message.guild.id].songs.shift()
                     queue[message.guild.id].nowplaying = false
                     if (queue[message.guild.id].songs[0]) {
-                        FetchFirstSong(message)
+                        FetchFirstSong(message, showMessage)
                     } else {
                         queue[message.guild.id].voiceChannel.leave()
-                        let embed = new MessageEmbed()
-                            .setDescription(`I go bye bye 👋👋`)
-                            .setColor("#FF0000")
-                        queue[message.guild.id].textChannel.send({ embed })
+                        if (showMessage) {
+                            let embed = new MessageEmbed()
+                                .setDescription(`I go bye bye 👋👋`)
+                                .setColor("#FF0000")
+                            queue[message.guild.id].textChannel.send({ embed })
+                        }
                         queue[message.guild.id] = {};
                     }
                 } else {
                     queue[message.guild.id].nowplaying = false
-                    FetchFirstSong(message)
+                    FetchFirstSong(message, showMessage)
                 }
             })
             .on("error", e => { console.error(e) })
             .on("pause", () => { console.log("stream in pause") })
 
-        let embed = new MessageEmbed()
-            .setDescription(`Started playing **${song.title}** 😎`)
-            .setColor("#00FF00")
-        queue[message.guild.id].textChannel.send({ embed })
+        if (showMessage) {
+            let embed = new MessageEmbed()
+                .setDescription(`Started playing **${song.title}** 😎`)
+                .setColor("#00FF00")
+            queue[message.guild.id].textChannel.send({ embed })
+        }
     } else {
         let last_song = queue[message.guild.id].songs[queue[message.guild.id].songs.lenght - 1];
-        if (last_song) {
-            let embed = new MessageEmbed()
-                .setDescription(`**${last_song.title}** queued 🥳`)
-                .setColor("#00FF00")
-            queue[message.guild.id].textChannel.send({ embed })
-        } else {
-            let embed = new MessageEmbed()
-                .setDescription(`Song queued 🥳`)
-                .setColor("#00FF00")
-            queue[message.guild.id].textChannel.send({ embed })
+        if (showMessage) {
+            if (last_song) {
+                let embed = new MessageEmbed()
+                    .setDescription(`**${last_song.title}** queued 🥳`)
+                    .setColor("#00FF00")
+                queue[message.guild.id].textChannel.send({ embed })
+            } else {
+                let embed = new MessageEmbed()
+                    .setDescription(`Song queued 🥳`)
+                    .setColor("#00FF00")
+                queue[message.guild.id].textChannel.send({ embed })
+            }
         }
     }
 }
 
-export async function FetchFirstSong(message) {
+export async function FetchFirstSong(message, showMessage) {
     if (queue[message.guild.id] && queue[message.guild.id].songs && queue[message.guild.id].songs[0]) {
         let song = queue[message.guild.id].songs[0];
         const link = "./audios/" + song.videoId + ".mp3";
@@ -99,9 +109,9 @@ export async function FetchFirstSong(message) {
             if (!fs.existsSync(link)) {
                 ytdl(song.video_url, { quality: "highestaudio", filter: "audioonly" })
                     .pipe(fs.createWriteStream(link))
-                    .on("finish", () => { PlayFirstSong(message, link, song); });
+                    .on("finish", () => { PlayFirstSong(message, link, song, showMessage); });
             } else {
-                PlayFirstSong(message, link, song);
+                PlayFirstSong(message, link, song, showMessage);
             }
         } catch(e) { console.log(e) }
     }

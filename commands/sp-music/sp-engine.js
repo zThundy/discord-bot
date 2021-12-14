@@ -10,8 +10,7 @@ var buisy = false;
 function _ElaborateQueue(client, songs, message, voiceChannel) {
     if (songs && songs.length > 0) {
         const song = songs.shift();
-        console.log("Enqueuing", song)
-        QueueSong(client, song, message, voiceChannel);
+        QueueSong(client, song, message, voiceChannel, false);
         setTimeout(() => { _ElaborateQueue(client, songs, message, voiceChannel); }, 10000)
     } else {
         buisy = false
@@ -36,7 +35,7 @@ export async function SearchSongName(client, args, message, voiceChannel) {
             args = [args[0], songInfo.name, songInfo.artists[0].name];
         else
             args = [args[0], songInfo.name];
-        QueueSong(client, args, message, voiceChannel);
+        QueueSong(client, args, message, voiceChannel, true);
     } catch (e) {
         console.error(e)
         let embed = new MessageEmbed()

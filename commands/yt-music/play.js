@@ -20,7 +20,7 @@ export async function run(client, args, message) {
         message.channel.send({ embed });
         return;
     }
-    QueueSong(client, args, message, voiceChannel);
+    QueueSong(client, args, message, voiceChannel, true);
 }
 
 
