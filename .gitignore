@@ -140,7 +140,8 @@ dist
 .webpack/
 
 ### Custom Files ###
-config.*
+config.js
 .vscode/
+*.db
 
 # End of https://www.toptal.com/developers/gitignore/api/node,audio
