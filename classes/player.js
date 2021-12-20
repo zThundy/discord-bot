@@ -2,7 +2,7 @@ import fs from "fs";
 import ytdl from "ytdl-core";
 import ytsr from "ytsr";
 import config from "../config.js";
-import Spotify from "../../classes/spotify.js";
+import Spotify from "./spotify.js";
 import { MessageEmbed } from "discord.js";
 
 const spotify = new Spotify(config.spotify);
