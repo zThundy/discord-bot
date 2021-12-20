@@ -8,9 +8,10 @@ export function getCommandInfo() {
 }
 
 export async function run(client, args, message) {
-    const [song, loop] = client.player.nowplaying();
+    const a = client.player.nowplaying();
+    const song = a[0];
 
-    if (song.length == 0) {
+    if (!song) {
         let embed = new MessageEmbed()
             .setDescription("No song playing rn 😔")
             .setColor("#FF0000");
