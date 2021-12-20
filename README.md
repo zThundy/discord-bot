@@ -36,5 +36,14 @@ If you want to search songs from spotify, just go to the [Spotify Developer Dash
     },
 ...
 ```
+
+If you want to search the lyric of the current playing song using the "lyric" command, you must register a developer account on [MusixMatch](https://developer.musixmatch.com/), then insert the api key in the `config.js` file. Keep in mind that the free api do not provide access to the complete lyric of a song.
+```js
+...
+    lyrics: {
+        token: "YOUR_MUSIXMATCH_TOKEN_HERE"
+    },
+...
+```
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
