@@ -4,6 +4,7 @@ export default {
     spotify: {
         clientId: "YOUR_SPOTIFY_ID_HERE",
         secret: "YOUR_SPOTIFY_SECRET_HERE"
+    },
     lyrics: {
         token: "YOUR_MUSIXMATCH_TOKEN_HERE"
     },
