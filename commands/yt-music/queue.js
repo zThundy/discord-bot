@@ -1,17 +1,23 @@
 import { MessageEmbed } from "discord.js";
-import { GetSongs } from "./yt-engine.js";
-import { FormatNumber } from "./../../utils.js";
+import { FormatNumber } from "./../../classes/utils.js";
 import config from "./../../config.js";
 
 let queueMessages = {};
 let queueIndex = {};
+
+export function getCommandInfo() {
+    return {
+        command: "queue",
+        description: "Show the list of queued songs in this server 🔠",
+    }
+}
 
 export async function run(client, args, message) {
     CreateQueueMessage(client, args, message);
 }
 
 const CreateQueueMessage = async (client, args, message) => {
-    let songs = await GetSongs(message)
+    let songs = client.player.getSongs();
     if (songs && songs[0]) {
         queueIndex[message.guild.id] = 1;
         let description = GetQueueDescription(songs, queueIndex[message.guild.id], (config.musicPlayer.queueMaxView - 1) + queueIndex[message.guild.id]);
@@ -43,7 +49,7 @@ const CreateQueueMessage = async (client, args, message) => {
 
 export async function reactionAdd(client, reactionMessage, user) {
     let message = reactionMessage.message;
-    let songs = await GetSongs(message);
+    let songs = client.player.getSongs();
 
     if (songs.length == 0) {
         delete queueMessages[message.guild.id];
@@ -83,6 +89,8 @@ const GetQueueDescription = (songs, minIndex, maxIndex) => {
 
     for (var i in songs) {
         if ((Number(i) + 1) <= maxIndex && (Number(i) + 1) >= minIndex) {
+            if (songs[i].title.length >= 40) songs[i].title = songs[i].title.slice(0, 40) + "...";
+
             if (songs[i].allowRatings) {
                 description += `[${(Number(i) + 1)}] ${songs[i].title} - ${FormatNumber(songs[i].likes)} 👍\n`;
             } else {

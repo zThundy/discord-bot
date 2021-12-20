@@ -1,9 +1,11 @@
 import Discord from "discord.js";
-import Colors from "./colors.js";
 import { init } from "./commands/init.js";
 import config from "./config.js";
-import SQL from "./sqlite.js";
-import Lyrics from "./lyrics.js";
+// custom classes import
+import SQL from "./classes/sqlite.js";
+import Colors from "./classes/colors.js";
+import Player from "./classes/player.js";
+import Lyrics from "./classes/lyrics.js";
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -17,6 +19,7 @@ client.on("ready", () => {
     console.log(colors.changeBackground("green", "Bot authed successfully :)"));
     client.database = database;
     client.lyrics = lyrics;
+    client.player = new Player(client);
     init(client, config);
 });
 

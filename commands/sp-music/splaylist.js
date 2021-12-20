@@ -1,6 +1,19 @@
 import { MessageEmbed } from "discord.js";
 import { GetPlaylistSongs } from "./sp-engine.js";
 
+export function getCommandInfo() {
+    return {
+        command: "splaylist",
+        description: "Start fetching all songs from a spotify playlist link 🔊",
+        args: [
+            {
+                name: "spotify-playlist-link",
+                description: "Adding this argument the bot will join (if not already) to your channel and will start fetching all songs from a spotify playlist link"
+            }
+        ]
+    }
+}
+
 export async function run(client, args, message) {
     let errMessage;
     let voiceChannel = message.member.voice.channel;

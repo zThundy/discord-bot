@@ -1,5 +1,10 @@
-import { StopPlayback } from "./yt-engine.js";
+export function getCommandInfo() {
+    return {
+        command: "stop",
+        description: "Stop the current song stream and disconnects the bot 🔇",
+    }
+}
 
 export async function run(client, args, message) {
-    StopPlayback(message);
+    client.player.stop();
 }

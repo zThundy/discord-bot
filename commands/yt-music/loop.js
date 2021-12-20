@@ -1,5 +1,10 @@
-import { LoopCurrentSong } from "./yt-engine.js";
+export function getCommandInfo() {
+    return {
+        command: "loop",
+        description: "Will start looping the current playling song 🔂"
+    }
+}
 
 export async function run(client, args, message) {
-    LoopCurrentSong(message)
+    client.player.loop();
 }

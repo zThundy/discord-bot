@@ -6,7 +6,10 @@ let timeouts = {};
 
 export function GetCommands() { return paths; }
 
-export function RemoveFromPath(path) { paths = paths.filter(filterPath => filterPath.path != path) }
+export function UnregisterCommand(client, path) {
+    paths = paths.filter(filterPath => filterPath.path != path)
+    client.commands.delete(path);
+}
 
 export function GetCommand(command) { return paths.filter(path => path.module == command) }
 
@@ -43,6 +46,8 @@ export async function init(client, config) {
         if (message.author.bot) return;
         let args = message.content.split(" ");
         if (args[0].indexOf(config.prefix) == -1) return;
+        // update player message every time a message is fired
+        client.player.update(client, message);
         try {
             let command = args[0].replace(config.prefix, "").toLowerCase();
             let prop = client.commands.get(command);

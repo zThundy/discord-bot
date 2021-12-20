@@ -1,6 +1,6 @@
 import { MessageEmbed } from "discord.js";
 import config from "./../config.js";
-import { RegisterCommand, GetCommand, RemoveFromPath } from "./init.js";
+import { RegisterCommand, GetCommand, UnregisterCommand } from "./init.js";
 
 export async function run(client, args, message) {
     if (config.admins.includes(message.author.id)) {
@@ -15,8 +15,7 @@ export async function run(client, args, message) {
         try {
             let command = GetCommand(args[1]);
             if (command[0]) {
-                client.commands.delete(command[0].module);
-                RemoveFromPath(command[0].path);
+                UnregisterCommand(client, command[0].path);
                 RegisterCommand(client, command[0].path, command[0].module + ".js");
                 let embed = new MessageEmbed()
                     .setDescription("Module reloaded ♻️")

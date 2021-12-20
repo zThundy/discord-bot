@@ -1,5 +1,21 @@
 import { MessageEmbed } from "discord.js";
-import { QueueSong } from "./yt-engine.js";
+
+export function getCommandInfo() {
+    return {
+        command: "play",
+        description: "Start a song stream in your voice channel via youtube search 🔊",
+        args: [
+            {
+                name: "youtube-link",
+                description: "Adding this argument the bot will join (if not already) to your channel and will start the song playback of the given youtube link"
+            },
+            {
+                name: "video title",
+                description: "Adding this argument the bot will join (if not already) to your channel and will start the playback of the first result of a youtube search"
+            }
+        ]
+    }
+}
 
 export async function run(client, args, message) {
     let errMessage;
@@ -20,7 +36,14 @@ export async function run(client, args, message) {
         message.channel.send({ embed });
         return;
     }
-    QueueSong(client, args, message, voiceChannel, true);
+    // QueueSong(client, args, message, voiceChannel, true);
+    client.player.play(args)
+}
+
+export async function userJoinChannel(client, oldState, newState) {
+    if (newState.member.user.bot && client.user.id == newState.member.user.id)
+        if (!newState.serverDeaf) 
+            newState.setDeaf(true);
 }
 
 

@@ -1,13 +1,20 @@
 import { MessageEmbed } from "discord.js";
-import { GetCurrentSong, IsCurrentSongLooping } from "./yt-engine.js";
-import { FormatNumber } from "./../../utils.js";
+import { FormatNumber } from "./../../classes/utils.js";
+
+export function getCommandInfo() {
+    return {
+        command: "nowplaying",
+        description: "If a song is playing, will show the song general informations 📜",
+    }
+}
 
 export async function run(client, args, message) {
-    let song = await GetCurrentSong(message);
-    let looping = await IsCurrentSongLooping(message);
+    let a = client.player.nowplaying();
+    const song = a[0];
+    const looping = a[1];
 
     // check if something is playing
-    if (song.length == 0) {
+    if (!song) {
         let embed = new MessageEmbed()
             .setDescription("No song playing rn 😔")
             .setColor("#FF0000");

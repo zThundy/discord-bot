@@ -1,6 +1,12 @@
 import { MessageEmbed } from "discord.js";
-import { SkipCurrentSong } from "./yt-engine.js";
 import config from "./../../config.js";
+
+export function getCommandInfo() {
+    return {
+        command: "skip",
+        description: "Skip the current song to the next in queue (if present) ⏩",
+    }
+}
 
 let timeouts = {};
 
@@ -18,5 +24,5 @@ export async function run(client, args, message) {
         delete timeouts[message.guild.id];
     }, config.musicPlayer.timeBetweenCommands * 1000);
 
-    SkipCurrentSong(message);
+    client.player.skip();
 }

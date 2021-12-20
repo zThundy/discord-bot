@@ -1,8 +1,14 @@
 import { MessageEmbed } from "discord.js";
-import { GetCurrentSong } from "./yt-engine.js";
+
+export function getCommandInfo() {
+    return {
+        command: "lyrics",
+        description: "Will search the current song's lyrics from various sources 📜"
+    }
+}
 
 export async function run(client, args, message) {
-    const song = await GetCurrentSong(message);
+    const [song, loop] = client.player.nowplaying();
 
     if (song.length == 0) {
         let embed = new MessageEmbed()

@@ -1,10 +1,20 @@
 import config from "./../config.js";
 
-let fields = []
-let commandsArgs = {}
-
 export async function run(client, args, message) {
-    let embed = {}
+    const fields = []
+    var embed = {}
+    const commandsArgs = {}
+
+    client.commands.forEach(command => {
+        if (command.getCommandInfo) {
+            const info = command.getCommandInfo();
+            fields.push({
+                name: config.prefix + info.command,
+                value: info.description + "\n`❓ Has arguments: " + (info.args ? "✅" : "❌") + "`"
+            });
+            commandsArgs[info.command] = info.args;
+        }
+    })
     
     if (args[1] && commandsArgs[args[1]]) {
         let argsFields = []
@@ -42,15 +52,4 @@ export async function run(client, args, message) {
     }
 
     message.channel.send({ embed })
-}
-
-export async function init(client) {
-    let commands = config.commands
-    for (var i in commands) {
-        fields.push({
-            name: config.prefix + commands[i].command,
-            value: commands[i].description + "\n`❓ Has arguments: " + (commands[i].args ? "✅" : "❌") + "`"
-        })
-        commandsArgs[commands[i].command] = commands[i].args
-    }
 }
