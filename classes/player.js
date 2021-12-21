@@ -150,11 +150,14 @@ class Player {
         return new Promise((resolve, reject) => {
             const link = "./audios/" + song.videoId + ".mp3";
             try {
-                if (!fs.existsSync(link))
-                    return ytdl(song.video_url, { quality: "highestaudio", filter: "audioonly" })
+                if (!fs.existsSync(link)) {
+                    log("Downloading from youtube " + song.title);
+                    ytdl(song.video_url, { quality: "highestaudio", filter: "audioonly" })
                         .pipe(fs.createWriteStream(link))
-                        .on("finish", () => { resolve() });
-                resolve(link)
+                        .on("finish", () => { resolve(); });
+                } else {
+                    resolve(link);
+                }
             } catch(e) { reject(e); }
         })
     }
