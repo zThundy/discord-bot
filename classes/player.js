@@ -140,6 +140,7 @@ class Player {
                     songInfo = await ytdl.getBasicInfo(args[1]);
                 }
                 let song = songInfo.videoDetails;
+                log("Got informations for song: " + song.title);
                 resolve(song);
             } catch(e) { reject(e); }
         });
@@ -158,7 +159,7 @@ class Player {
         })
     }
 
-    _start() {
+    _start(args = false) {
         try {
             // if there's nothing playing
             if (!this.queue[this.message.guild.id].getNowplaying()) {
@@ -166,20 +167,23 @@ class Player {
                 // set nowplaying to current song
                 this.queue[this.message.guild.id].setValue("nowplaying", song);
                 const connection = this.queue[this.message.guild.id].getValue("connection");
+                if (args) song = args;
                 log("Started playing " + song.local_link);
                 const dispatcher = connection
                     .play(song.local_link)
                     .on("finish", () => {
+                        // get always all the looping informations before the nowplaying is resetted
                         const loop = this.queue[this.message.guild.id].getValue("loop");
-                        // get the first song for loop check
+                        const looping = this.queue[this.message.guild.id].getValue("nowplaying");
+                        // get the first song for the queue checks: if no song is in the first position,
+                        // then stops the playback
                         song = this.queue[this.message.guild.id].getFirst();
                         this.queue[this.message.guild.id].setValue("nowplaying", false);
                         if (song) {
                             if (loop) {
-                                this._start(["play", song.video_url]);
+                                this._start(looping);
                             } else {
-                                song = this.queue[this.message.guild.id].getFirst();
-                                this._start(["play", song.video_url]);
+                                this._start();
                             }
                         } else {
                             this.stop();
@@ -226,6 +230,7 @@ class Player {
                         .setDescription(string)
                         .setColor("#FF0000");
                     this.message.channel.send({ embed });
+                    log(string);
                 });
             });
         })
