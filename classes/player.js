@@ -176,10 +176,11 @@ class Player {
             // if there's nothing playing
             if (!this.queue[this.message.guild.id].getNowplaying()) {
                 var song = this.queue[this.message.guild.id].getFirst();
+                // check if a song is passed as argument use it for everything
+                if (args) song = args;
                 // set nowplaying to current song
                 this.queue[this.message.guild.id].setValue("nowplaying", song);
                 const connection = this.queue[this.message.guild.id].getValue("connection");
-                if (args) song = args;
                 log("Started playing " + song.local_link);
                 const dispatcher = connection
                     .play(song.local_link)
@@ -190,10 +191,12 @@ class Player {
                         // get the first song for the queue checks: if no song is in the first position,
                         // then stops the playback
                         song = this.queue[this.message.guild.id].getFirst();
+                        // check if loop is true to start playback even if queue is empty
+                        if (loop) song = looping;
                         this.queue[this.message.guild.id].setValue("nowplaying", false);
                         if (song) {
                             if (loop) {
-                                this._start(looping);
+                                this._start(song);
                             } else {
                                 this._start();
                             }
@@ -226,7 +229,10 @@ class Player {
                 // enqueue the song with all the informations
                 this.queue[this.message.guild.id].enqueue(song)
                 .then(() => {
-                    this._start();
+                    this.message.react("✅")
+                    .then(() => {
+                        this._start();
+                    });
                 })
                 .catch(e => {
                     let string = "";
@@ -252,33 +258,33 @@ class Player {
     skip() {
         // check if there's something playing
         if (this.queue[this.message.guild.id].getNowplaying()) {
-            const dispatcher = this.queue[this.message.guild.id].getValue("dispatcher");
-            dispatcher.end();
+            this.message.react("✅")
+            .then(() => {
+                const dispatcher = this.queue[this.message.guild.id].getValue("dispatcher");
+                dispatcher.end();
+            });
         }
     }
 
     loop() {
         // check if there's something playing
-        if (this.queue[this.message.guild.id].getNowplaying()) {
-            const loop = this.queue[this.message.guild.id].getValue("loop");
-            this.queue[this.message.guild.id].setValue("loop", !loop);
-            
-            if (loop) {
-                let embed = new MessageEmbed()
-                    .setDescription("No more song loop")
-                    .setColor("#FF0000");
-                this.message.channel.send({ embed });
-            } else {
-                let embed = new MessageEmbed()
-                    .setDescription("Looping current song")
-                    .setColor("#FF0000");
-                this.message.channel.send({ embed });
-            }
-        }
+        const loop = this.queue[this.message.guild.id].getValue("loop");
+        const nowplaying = this.queue[this.message.guild.id].getNowplaying();
+        this.queue[this.message.guild.id].setValue("loop", !loop);
+        let string;
+        if (loop)
+            string = `Stopped looping of **${nowplaying.title}**`;
+        else
+            string = `Now looping **${nowplaying.title}**`;
+        let embed = new MessageEmbed()
+            .setDescription(string)
+            .setColor("#FFFF00");
+        this.message.channel.send({ embed });
     }
 
     stop() {
-        if (this.queue[this.message.guild.id].getNowplaying()) {
+        this.message.react("✅")
+        .then(() => {
             this.queue[this.message.guild.id].setValue("songs", []);
             this.queue[this.message.guild.id].setValue("loop", false);
             this.queue[this.message.guild.id].setValue("nowplaying", false);
@@ -288,7 +294,7 @@ class Player {
             this.queue[this.message.guild.id].setValue("dispatcher", null);
             this.queue[this.message.guild.id].setValue("textChannel", null);
             this.queue[this.message.guild.id].setValue("voiceChannel", null);
-        }
+        });
     }
 
     nowplaying() {
