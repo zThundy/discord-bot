@@ -4,6 +4,7 @@ import ytsr from "ytsr";
 import config from "../config.js";
 import Spotify from "./spotify.js";
 import { MessageEmbed } from "discord.js";
+import { log } from "./utils.js";
 
 const spotify = new Spotify(config.spotify);
 
@@ -158,34 +159,39 @@ class Player {
     }
 
     _start() {
-        // if there's nothing playing
-        if (!this.queue[this.message.guild.id].getNowplaying()) {
-            var song = this.queue[this.message.guild.id].getFirst();
-            // set nowplaying to current song
-            this.queue[this.message.guild.id].setValue("nowplaying", song);
-            const connection = this.queue[this.message.guild.id].getValue("connection");
-            const dispatcher = connection
-                .play(song.local_link)
-                .on("finish", () => {
-                    const loop = this.queue[this.message.guild.id].getValue("loop");
-                    // get the first song for loop check
-                    song = this.queue[this.message.guild.id].getFirst();
-                    this.queue[this.message.guild.id].setValue("nowplaying", false);
-                    if (song) {
-                        if (loop) {
-                            this._start(["play", song.video_url]);
+        try {
+            // if there's nothing playing
+            if (!this.queue[this.message.guild.id].getNowplaying()) {
+                var song = this.queue[this.message.guild.id].getFirst();
+                // set nowplaying to current song
+                this.queue[this.message.guild.id].setValue("nowplaying", song);
+                const connection = this.queue[this.message.guild.id].getValue("connection");
+                log("Started playing " + song.local_link);
+                const dispatcher = connection
+                    .play(song.local_link)
+                    .on("finish", () => {
+                        const loop = this.queue[this.message.guild.id].getValue("loop");
+                        // get the first song for loop check
+                        song = this.queue[this.message.guild.id].getFirst();
+                        this.queue[this.message.guild.id].setValue("nowplaying", false);
+                        if (song) {
+                            if (loop) {
+                                this._start(["play", song.video_url]);
+                            } else {
+                                song = this.queue[this.message.guild.id].getFirst();
+                                this._start(["play", song.video_url]);
+                            }
                         } else {
-                            song = this.queue[this.message.guild.id].getFirst();
-                            this._start(["play", song.video_url]);
+                            this.stop();
                         }
-                    } else {
-                        this.stop();
-                    }
-                })
-                .on("error", e => { console.error(e) })
-                .on("pause", () => { console.log("stream in pause") })
-            this.queue[this.message.guild.id].setValue("dispatcher", dispatcher);
-            this.queue[this.message.guild.id].dequeue();
+                    })
+                    .on("error", e => { console.error(e) })
+                    .on("pause", () => { console.log("stream in pause") })
+                this.queue[this.message.guild.id].setValue("dispatcher", dispatcher);
+                this.queue[this.message.guild.id].dequeue();
+            }
+        } catch(e) {
+            log("Error on playing song: " + e);
         }
     }
 

@@ -1,3 +1,5 @@
+import fs from "fs";
+
 export function FormatNumber (value) {
     var newValue = value;
     if (value >= 1000) {
@@ -13,6 +15,25 @@ export function FormatNumber (value) {
         newValue = shortValue + suffixes[suffixNum];
     }
     return newValue;
+}
+
+export function log(message) {
+    fs.readFile("log.txt", 'utf8', (err, data) => {
+        var currentdate = new Date();
+        var datetime = currentdate.getDate() + "/"
+                + (currentdate.getMonth() + 1)  + "/"
+                + currentdate.getFullYear() + " | "
+                + currentdate.getHours() + ":"
+                + currentdate.getMinutes() + ":"
+                + currentdate.getSeconds() + " @"
+        message = datetime + " " + message
+        data = data + "\n" + message
+        console.log(message)
+
+        fs.writeFile("log.txt", data, (err) => {
+            if (err) throw err;
+        })
+    })
 }
 
 export function FormatToMysql(time) {
