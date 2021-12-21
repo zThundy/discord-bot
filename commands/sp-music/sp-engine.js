@@ -11,7 +11,7 @@ function _ElaborateQueue(client, songs, message, voiceChannel) {
         const song = songs.shift();
         client.player.play(song);
         // QueueSong(client, song, message, voiceChannel, false);
-        setTimeout(() => { _ElaborateQueue(client, songs, message, voiceChannel); }, 10000)
+        setTimeout(() => { _ElaborateQueue(client, songs, message, voiceChannel); }, 30 * 1000)
     } else {
         buisy = false
     };
