@@ -118,7 +118,15 @@ class Player {
             try {
                 let songInfo;
                 if (this._isSpotifyLink(args[1])) {
-                    songInfo = await spotify.getTrackByURL(args[1]);
+                    var query = await spotify.getTrackByURL(args[1]);
+                    if (query.artists)
+                        query = query.name + " " + query.artists[0].name;
+                    else
+                        query = query.name;
+                    const searchResults = await ytsr(query, { limit: 1 });
+                    if (searchResults && searchResults.items)
+                        if (searchResults.items[0].url)
+                            songInfo = await ytdl.getBasicInfo(searchResults.items[0].url);
                 } else if (!this._isYoutubeLink(args[1])) {
                     var string = "";
                     args.shift();
@@ -149,7 +157,7 @@ class Player {
         })
     }
 
-    _start(args) {
+    _start() {
         // if there's nothing playing
         if (!this.queue[this.message.guild.id].getNowplaying()) {
             var song = this.queue[this.message.guild.id].getFirst();
@@ -196,7 +204,7 @@ class Player {
                 // enqueue the song with all the informations
                 this.queue[this.message.guild.id].enqueue(song)
                 .then(() => {
-                    this._start(args);
+                    this._start();
                 })
                 .catch(e => {
                     let string = "";
