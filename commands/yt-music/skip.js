@@ -24,5 +24,8 @@ export async function run(client, args, message) {
         delete timeouts[message.guild.id];
     }, config.musicPlayer.timeBetweenCommands * 1000);
 
-    client.player.skip();
+    message.react("✅")
+    .then(() => {
+        client.player.skip();
+    });
 }

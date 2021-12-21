@@ -6,5 +6,8 @@ export function getCommandInfo() {
 }
 
 export async function run(client, args, message) {
-    client.player.stop();
+    message.react("✅")
+    .then(() => {
+        client.player.stop();
+    });
 }

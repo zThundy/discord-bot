@@ -258,11 +258,8 @@ class Player {
     skip() {
         // check if there's something playing
         if (this.queue[this.message.guild.id].getNowplaying()) {
-            this.message.react("✅")
-            .then(() => {
-                const dispatcher = this.queue[this.message.guild.id].getValue("dispatcher");
-                dispatcher.end();
-            });
+            const dispatcher = this.queue[this.message.guild.id].getValue("dispatcher");
+            dispatcher.end();
         }
     }
 
@@ -283,18 +280,15 @@ class Player {
     }
 
     stop() {
-        this.message.react("✅")
-        .then(() => {
-            this.queue[this.message.guild.id].setValue("songs", []);
-            this.queue[this.message.guild.id].setValue("loop", false);
-            this.queue[this.message.guild.id].setValue("nowplaying", false);
-            const voiceChannel = this.queue[this.message.guild.id].getValue("voiceChannel");
-            voiceChannel.leave();
-            this.queue[this.message.guild.id].setValue("connection", null);
-            this.queue[this.message.guild.id].setValue("dispatcher", null);
-            this.queue[this.message.guild.id].setValue("textChannel", null);
-            this.queue[this.message.guild.id].setValue("voiceChannel", null);
-        });
+        this.queue[this.message.guild.id].setValue("songs", []);
+        this.queue[this.message.guild.id].setValue("loop", false);
+        this.queue[this.message.guild.id].setValue("nowplaying", false);
+        const voiceChannel = this.queue[this.message.guild.id].getValue("voiceChannel");
+        voiceChannel.leave();
+        this.queue[this.message.guild.id].setValue("connection", null);
+        this.queue[this.message.guild.id].setValue("dispatcher", null);
+        this.queue[this.message.guild.id].setValue("textChannel", null);
+        this.queue[this.message.guild.id].setValue("voiceChannel", null);
     }
 
     nowplaying() {
