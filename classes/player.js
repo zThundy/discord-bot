@@ -100,7 +100,10 @@ class Player {
     }
 
     _isSpotifyLink(link) {
-        if (link.indexOf("https") === -1 && !(link.includes("spotify") || link.includes("open.spotify"))) return false;
+        // check first if this is a link or not
+        if (!link.includes("http")) return false;
+        // check if the link is from spotify
+        if (!(link.includes("spotify") || link.includes("open.spotify"))) return false;
         return true;
     }
 
@@ -110,7 +113,10 @@ class Player {
     }
 
     _isYoutubeLink(link) {
-        if (link.indexOf("https") === -1 && (!(link.includes("youtube") || link.includes("youtu")))) return false;
+        // check first if this is a link or not
+        if (!link.includes("http")) return false;
+        // check if the link is from youtube
+        if ((!(link.includes("youtube") || link.includes("youtu")))) return false;
         return true;
     }
 
@@ -154,7 +160,10 @@ class Player {
                     log("Downloading from youtube " + song.title);
                     ytdl(song.video_url, { quality: "highestaudio", filter: "audioonly" })
                         .pipe(fs.createWriteStream(link))
-                        .on("finish", () => { resolve(); });
+                        .on("finish", () => {
+                            log("Finished downloading from youtube " + song.title);
+                            resolve(link);
+                        });
                 } else {
                     resolve(link);
                 }
