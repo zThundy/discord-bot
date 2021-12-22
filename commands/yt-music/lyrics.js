@@ -3,7 +3,7 @@ import { MessageEmbed } from "discord.js";
 export function getCommandInfo() {
     return {
         command: "lyrics",
-        description: "Will search the current song's lyrics from various sources 📜"
+        description: "Will search the current song's lyrics from various sources 🧾"
     }
 }
 

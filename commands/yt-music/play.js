@@ -3,7 +3,7 @@ import { MessageEmbed } from "discord.js";
 export function getCommandInfo() {
     return {
         command: "play",
-        description: "Start a song stream in your voice channel via youtube search 🔊",
+        description: "Start a song stream in your voice channel via youtube search ▶️",
         args: [
             {
                 name: "youtube-link",

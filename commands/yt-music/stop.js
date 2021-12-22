@@ -1,7 +1,7 @@
 export function getCommandInfo() {
     return {
         command: "stop",
-        description: "Stop the current song stream and disconnects the bot 🔇",
+        description: "Stop the current song stream and disconnects the bot ⏹",
     }
 }
 

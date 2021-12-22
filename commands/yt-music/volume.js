@@ -1,5 +1,12 @@
 import { MessageEmbed } from "discord.js";
 
+export function getCommandInfo() {
+    return {
+        command: "volume",
+        description: "Change the bot volume; values are from 1 to 100 🔊",
+    }
+}
+
 export async function run(client, args, message) {
     var volume = client.player.getVolume();
     args[1] = Number(args[1]);
