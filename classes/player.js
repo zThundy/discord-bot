@@ -310,9 +310,11 @@ class Player {
     }
 
     setVolume(volume) {
-        this.queue[this.message.guild.id].setValue("volume", volume);
-        const dispatcher = this.queue[this.message.guild.id].getValue("dispatcher");
-        dispatcher.setVolume(volume);
+        if (this.queue[this.message.guild.id].getNowplaying()) {
+            this.queue[this.message.guild.id].setValue("volume", volume);
+            const dispatcher = this.queue[this.message.guild.id].getValue("dispatcher");
+            dispatcher.setVolume(volume);
+        }
     }
 }
 
