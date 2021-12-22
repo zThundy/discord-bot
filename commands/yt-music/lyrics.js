@@ -26,7 +26,7 @@ export async function run(client, args, message) {
     // if not, it's an error UwU
     if (lyrics.lyrics_body.length > 100) {
         const link = await client.lyrics.getTrackLyricUrl(song.title, song.author.name)
-        lyrics.lyrics_body += "\n\n** You can only view 30% of the lyric **";
+        lyrics.lyrics_body += "\n\n**You can only view 30% of the lyric**";
         lyrics.lyrics_body += `\n**[MusixMatch Link](${link})**`;
     }
     let embed = new MessageEmbed()
