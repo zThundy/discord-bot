@@ -54,6 +54,11 @@ class Lyrics {
         if (error) return error;
         return data.message.body.lyrics;
     }
+
+    async getTrackLyricUrl(name, artist, album) {
+        const track = await this.getTrackInfo(name, artist, album)
+        return track.track_share_url;
+    }
 }
 
 export default Lyrics;
