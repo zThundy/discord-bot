@@ -175,6 +175,8 @@ class Player {
         try {
             // if there's nothing playing
             if (!this.queue[this.message.guild.id].getNowplaying()) {
+                // get volume to set right amount to dispatcher
+                const volume = this.queue[this.message.guild.id].getValue("volume");
                 var song = this.queue[this.message.guild.id].getFirst();
                 // check if a song is passed as argument use it for everything
                 if (args) song = args;
@@ -205,7 +207,8 @@ class Player {
                         }
                     })
                     .on("error", e => { console.error(e) })
-                    .on("pause", () => { console.log("stream in pause") })
+                    .on("pause", () => { console.log("stream in pause") }) ;
+                dispatcher.setVolume(volume);
                 this.queue[this.message.guild.id].setValue("dispatcher", dispatcher);
                 this.queue[this.message.guild.id].dequeue();
             }
@@ -300,6 +303,16 @@ class Player {
 
     getSongs() {
         return this.queue[this.message.guild.id].getValue("songs");
+    }
+
+    getVolume() {
+        return this.queue[this.message.guild.id].getValue("volume");
+    }
+
+    setVolume(volume) {
+        this.queue[this.message.guild.id].setValue("volume", volume);
+        const dispatcher = this.queue[this.message.guild.id].getValue("dispatcher");
+        dispatcher.setVolume(volume);
     }
 }
 
