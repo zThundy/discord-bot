@@ -25,7 +25,8 @@ export async function run(client, args, message) {
     // just randomly check if the string is longer than 100 because
     // if not, it's an error UwU
     if (lyrics.lyrics_body.length > 100) {
-        const link = await client.lyrics.getTrackLyricUrl(song.title, song.author.name)
+        var link = await client.lyrics.getTrackLyricUrl(song.title, song.author.name)
+        link = link.split("?")[0];
         lyrics.lyrics_body += "\n\n**You can only view 30% of the lyric**";
         lyrics.lyrics_body += `\n**[MusixMatch Link](${link})**`;
     }
