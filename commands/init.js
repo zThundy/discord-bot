@@ -122,11 +122,7 @@ export async function init(client, config) {
     });
 
     let status = `Online on ${client.guilds.cache.size} servers | ${config.prefix}help`;
-    if (client.guilds.cache.size == 1) { status = `Online on ${client.guilds.cache.size} server | ${config.prefix}help` }
+    if (client.guilds.cache.size == 1) status = `Online on ${client.guilds.cache.size} server | ${config.prefix}help`;
 
     client.user.setPresence({ activity: { name: status }, status: 'dnd' });
-
-    // if (config.status == "dev") return;
-    // client.user.setAvatar(config.avatar)
-    // client.user.setUsername(config.botName)
 }
