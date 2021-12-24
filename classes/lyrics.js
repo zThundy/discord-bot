@@ -1,5 +1,6 @@
 import Colors from "./colors.js";
 import request from "request-promise";
+import { log } from "./utils.js";
 const colors = new Colors();
 
 class Lyrics {
@@ -42,6 +43,7 @@ class Lyrics {
     }
 
     async getTrackLyrics(name, artist, album) {
+        log("Attemting search of song: " + name + " by " + artist + " from the album " + album);
         const track = await this.getTrackInfo(name, artist, album)
         if (!track.track_id) return { lyrics_body: this.errorHandling(track.code) };
         const id = track.track_id;
