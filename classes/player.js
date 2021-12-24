@@ -125,15 +125,21 @@ class Player {
             try {
                 let songInfo;
                 if (this._isSpotifyLink(args[1])) {
+                    let info;
                     var query = await spotify.getTrackByURL(args[1]);
-                    if (query.artists)
+                    if (query.artists) {
+                        info = { name: query.name, artist: query.artists[0].name };
                         query = query.name + " " + query.artists[0].name;
-                    else
+                    } else {
+                        info = { name: query.name };
                         query = query.name;
+                    }
                     const searchResults = await ytsr(query, { limit: 1 });
                     if (searchResults && searchResults.items)
-                        if (searchResults.items[0].url)
+                        if (searchResults.items[0].url) {
                             songInfo = await ytdl.getBasicInfo(searchResults.items[0].url);
+                            songInfo.spotify = info;
+                        }
                 } else if (!this._isYoutubeLink(args[1])) {
                     var string = "";
                     args.shift();
@@ -146,6 +152,7 @@ class Player {
                     songInfo = await ytdl.getBasicInfo(args[1]);
                 }
                 let song = songInfo.videoDetails;
+                if (songInfo.spotify) song.spotifyInfo = songInfo.spotify;
                 log("Got informations for song: " + song.title);
                 resolve(song);
             } catch(e) { reject(e); }
