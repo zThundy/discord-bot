@@ -23,7 +23,8 @@ export async function run(client, args, message) {
     // use the spotify informations insted of youtube ones
     if (song.spotifyInfo) {
         song.title = song.spotifyInfo.name;
-        if (song.spotifyInfo.artist) song.author.name = song.spotifyInfo.artist;
+        if (song.spotifyInfo.album.name) song.albumName = song.spotifyInfo.album.name;
+        if (song.spotifyInfo.artists && song.spotifyInfo.artists[0]) song.author.name = song.spotifyInfo.artists[0].name;
     }
 
     const lyrics = await client.lyrics.getTrackLyrics(song.title, song.author.name);
@@ -32,7 +33,7 @@ export async function run(client, args, message) {
     // just randomly check if the string is longer than 100 because
     // if not, it's an error UwU
     if (lyrics.lyrics_body.length > 100) {
-        var link = await client.lyrics.getTrackLyricUrl(song.title, song.author.name)
+        var link = await client.lyrics.getTrackLyricUrl(song.title, song.author.name, song.albumName)
         link = link.split("?")[0];
         lyrics.lyrics_body += "\n\n**You can only view 30% of the lyric**";
         lyrics.lyrics_body += `\n**[MusixMatch Link](${link})**`;

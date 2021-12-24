@@ -26,7 +26,8 @@ export async function run(client, args, message) {
     // use the spotify informations insted of youtube ones
     if (song.spotifyInfo) {
         song.title = song.spotifyInfo.name;
-        if (song.spotifyInfo.artist) song.author.name = song.spotifyInfo.artist;
+        if (song.spotifyInfo.album.name) song.albumName = song.spotifyInfo.album.name;
+        if (song.spotifyInfo.artists && song.spotifyInfo.artists[0]) song.author.name = song.spotifyInfo.artists[0].name;
     }
 
     let embed = new MessageEmbed()

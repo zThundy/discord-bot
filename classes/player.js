@@ -128,10 +128,10 @@ class Player {
                     let info;
                     var query = await spotify.getTrackByURL(args[1]);
                     if (query.artists) {
-                        info = { name: query.name, artist: query.artists[0].name };
+                        info = query;
                         query = query.name + " " + query.artists[0].name;
                     } else {
-                        info = { name: query.name };
+                        info = query;
                         query = query.name;
                     }
                     const searchResults = await ytsr(query, { limit: 1 });

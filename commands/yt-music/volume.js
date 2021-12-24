@@ -8,6 +8,7 @@ export function getCommandInfo() {
 }
 
 export async function run(client, args, message) {
+    let cachedValue = args[1];
     var volume = client.player.getVolume();
     volume = Math.round((volume + Number.EPSILON) * 100) / 100
 
@@ -24,7 +25,7 @@ export async function run(client, args, message) {
     args[1] = Math.round((args[1] + Number.EPSILON) * 100) / 100
     if (!(args[1] <= 1.0 && args[1] >= 0.01)) {
         if (isNaN(args[1])) {
-            string = `**${args[1]}** is not a valid value`;
+            string = `**${cachedValue}** is not a valid value`;
         } else {
             string = `You can't change the volume value to **${Math.floor(args[1] * 100)}**`;
         }
