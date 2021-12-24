@@ -22,6 +22,13 @@ export async function run(client, args, message) {
         return;
     }
 
+    // check if the song has been fetched from spotify, if yes
+    // use the spotify informations insted of youtube ones
+    if (song.spotifyInfo) {
+        song.title = song.spotifyInfo.name;
+        if (song.spotifyInfo.artist) song.author.name = song.spotifyInfo.artist;
+    }
+
     let embed = new MessageEmbed()
         .setTitle("Current song playing 🤩")
         .addFields([
@@ -29,6 +36,11 @@ export async function run(client, args, message) {
                 name: "Title",
                 value: song.title,
                 inline: true
+            },
+            {
+                name: "Author",
+                value: song.author.name,
+                inline: true 
             },
             {
                 name: "Views",

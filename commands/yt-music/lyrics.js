@@ -19,6 +19,13 @@ export async function run(client, args, message) {
         return;
     }
 
+    // check if the song has been fetched from spotify, if yes
+    // use the spotify informations insted of youtube ones
+    if (song.spotifyInfo) {
+        song.title = song.spotifyInfo.name;
+        if (song.spotifyInfo.artist) song.author.name = song.spotifyInfo.artist;
+    }
+
     const lyrics = await client.lyrics.getTrackLyrics(song.title, song.author.name);
     lyrics.lyrics_body = lyrics.lyrics_body.split("...");
     lyrics.lyrics_body = lyrics.lyrics_body[0];
