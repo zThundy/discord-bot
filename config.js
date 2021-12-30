@@ -6,6 +6,7 @@ export default {
         secret: "YOUR_SPOTIFY_SECRET_HERE"
     },
     lyrics: {
+        musixmathc: false,
         token: "YOUR_MUSIXMATCH_TOKEN_HERE"
     },
     musicPlayer: {
