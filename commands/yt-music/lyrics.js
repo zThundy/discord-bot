@@ -27,19 +27,10 @@ export async function run(client, args, message) {
         if (song.spotifyInfo.artists && song.spotifyInfo.artists[0]) song.author.name = song.spotifyInfo.artists[0].name;
     }
 
-    const lyrics = await client.lyrics.getTrackLyrics(song.title, song.author.name);
-    lyrics.lyrics_body = lyrics.lyrics_body.split("...");
-    lyrics.lyrics_body = lyrics.lyrics_body[0];
-    // just randomly check if the string is longer than 100 because
-    // if not, it's an error UwU
-    if (lyrics.lyrics_body.length > 100) {
-        var link = await client.lyrics.getTrackLyricUrl(song.title, song.author.name, song.albumName)
-        link = link.split("?")[0];
-        lyrics.lyrics_body += "\n\n**You can only view 30% of the lyric**";
-        lyrics.lyrics_body += `\n**[MusixMatch Link](${link})**`;
-    }
+    const lyrics = await client.lyrics.getTrackLyrics(song.title, song.author.name, song.albumName);
+
     let embed = new MessageEmbed()
-        .setDescription(lyrics.lyrics_body)
+        .setDescription(lyrics)
         .setColor("#6600CC")
     message.channel.send({ embed });
 }

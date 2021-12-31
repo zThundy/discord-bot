@@ -1,14 +1,90 @@
 import Colors from "./colors.js";
 import request from "request-promise";
 import { log } from "./utils.js";
+import { JSDOM } from "jsdom";
 const colors = new Colors();
 
 class Lyrics {
     constructor(config) {
+        this.delims = [
+            '</div></div></div></div><div class="hwc"><div class="BNeawe tAd8D AP7Wnd"><div><div class="BNeawe tAd8D AP7Wnd">',
+            '</div></div></div><div><span class="hwc"><div class="BNeawe uEec3 AP7Wnd">',
+        ];
+
+        this.url = "https://www.musixmatch.com/it/testo/";
+        
         this.link = `https://api.musixmatch.com/ws/1.1/`;
         this.key = config.token;
         this.apiRequest = { url: "", json: true };
     }
+
+    getShuffledArr = (arr) => {
+        const newArr = arr.slice();
+        for (let i = newArr.length - 1; i > 0; i -= i) {
+            const rand = Math.floor(Math.random() * (i + 1));
+            [newArr[i], newArr[rand]] = [newArr[rand], newArr[i]];
+        }
+        return newArr;
+    };
+
+    _parseString(string) {
+        if (string.includes("(feat. ")) {
+            var second_artist = string.split("(feat.")[1].split(")")[0];
+            second_artist = second_artist.trim();
+            string = string.split("(")[0];
+            string.trim();
+            string += second_artist;
+        }
+        string = string.trim();
+        string = string.replace(/ /g, "-");
+        return string;
+    }
+
+    _search(searchQuery) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                console.log("search query", `${this.url}${searchQuery}`)
+                const searchResult = await request.get(`${this.url}${searchQuery}`);
+                const dom = new JSDOM(searchResult);
+                const elements = dom.window.document.getElementsByClassName("mxm-lyrics__content");
+                var spans = [];
+                for (var i in elements) if (elements[i].tagName === "P") spans.push(elements[i].querySelector("span"));
+                var string;
+                for (var i in spans) string += spans[i].innerHTML;
+                if (typeof string !== "string") string = null;
+                resolve(string);
+            } catch(e) {
+                resolve(false);
+            }
+        });
+    }
+
+    async getTrackLyrics(song, artist, album) {
+        log("Attemting search of song: " + song + " by " + artist + " from the album " + album);
+        artist = this._parseString(artist);
+        song = this._parseString(song);
+        const string = `${artist}/${song}`;
+        /*
+        const queryes = this.getShuffledArr([
+            encodeURIComponent(`${artist} ${song} song`),
+            encodeURIComponent(`${artist} ${song} lyrics`),
+            encodeURIComponent(`${artist} ${song} song lyrics`),
+            encodeURIComponent(`${artist} ${song}`),
+        ]);
+        var res;
+        for (var i in queryes) {
+            res = await this._search(queryes[i])
+            if (res) break;
+        }
+        */
+        var res = await this._search(string);
+        if (!res) res = this._getTrackLyrics(song, artist, album);
+        return res;
+    }
+
+    /**
+     * Musix match section
+     */
 
     errorHandling(code) {
         code = Number(code);
@@ -42,10 +118,9 @@ class Lyrics {
         return data.message.body.track;
     }
 
-    async getTrackLyrics(name, artist, album) {
-        log("Attemting search of song: " + name + " by " + artist + " from the album " + album);
+    async _getTrackLyrics(name, artist, album) {
         const track = await this.getTrackInfo(name, artist, album)
-        if (!track.track_id) return { lyrics_body: this.errorHandling(track.code) };
+        if (!track.track_id) return this.errorHandling(track.code);
         const id = track.track_id;
         const commontrack_id = track.commontrack_id;
         let string = `track_id=${id}&commontrack_id=${commontrack_id}`;
@@ -54,7 +129,20 @@ class Lyrics {
         let data = await request.get(this.apiRequest);
         const error = this.errorHandling(data.message.header.status_code);
         if (error) return error;
-        return data.message.body.lyrics;
+
+        const lyrics = data.message.body.lyrics;
+        lyrics.lyrics_body = lyrics.lyrics_body.split("...");
+        lyrics.lyrics_body = lyrics.lyrics_body[0];
+        // just randomly check if the string is longer than 100 because
+        // if not, it's an error UwU
+        if (lyrics.lyrics_body.length > 100) {
+            var link = await this.getTrackLyricUrl(name, artist, album)
+            link = link.split("?")[0];
+            lyrics.lyrics_body += "\n\n**You can only view 30% of the lyric**";
+            lyrics.lyrics_body += `\n**[MusixMatch Link](${link})**`;
+        }
+
+        return lyrics.lyrics_body;
     }
 
     async getTrackLyricUrl(name, artist, album) {
