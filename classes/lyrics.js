@@ -35,6 +35,7 @@ class Lyrics {
             string.trim();
             string += second_artist;
         }
+        string = string.replace(/([!?$%])/g, "");
         string = string.trim();
         string = string.replace(/ /g, "-");
         return string;
@@ -43,14 +44,13 @@ class Lyrics {
     _search(searchQuery) {
         return new Promise(async (resolve, reject) => {
             try {
-                console.log("search query", `${this.url}${searchQuery}`)
-                const searchResult = await request.get(`${this.url}${searchQuery}`);
+                const searchResult = await request.get(searchQuery);
                 const dom = new JSDOM(searchResult);
                 const elements = dom.window.document.getElementsByClassName("mxm-lyrics__content");
                 var spans = [];
                 for (var i in elements) if (elements[i].tagName === "P") spans.push(elements[i].querySelector("span"));
-                var string;
-                for (var i in spans) string += spans[i].innerHTML;
+                var string = "";
+                for (var i in spans) if (spans[i]) string += spans[i].innerHTML;
                 if (typeof string !== "string") string = null;
                 resolve(string);
             } catch(e) {
@@ -77,7 +77,12 @@ class Lyrics {
             if (res) break;
         }
         */
-        var res = await this._search(string);
+        var res = await this._search(`${this.url}/${string}`);
+        if (!res) {
+            var link = await this.getTrackLyricUrl(song, artist, album)
+            link = link.split("?")[0];
+            res = await this._search(link);
+        }
         if (!res) res = this._getTrackLyrics(song, artist, album);
         return res;
     }
