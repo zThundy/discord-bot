@@ -6,19 +6,13 @@ const colors = new Colors();
 
 class Lyrics {
     constructor(config) {
-        this.delims = [
-            '</div></div></div></div><div class="hwc"><div class="BNeawe tAd8D AP7Wnd"><div><div class="BNeawe tAd8D AP7Wnd">',
-            '</div></div></div><div><span class="hwc"><div class="BNeawe uEec3 AP7Wnd">',
-        ];
-
-        this.url = "https://www.musixmatch.com/it/testo/";
-        
+        this.musixmatch = "https://www.musixmatch.com/lyrics/";
         this.link = `https://api.musixmatch.com/ws/1.1/`;
         this.key = config.token;
         this.apiRequest = { url: "", json: true };
     }
 
-    getShuffledArr = (arr) => {
+    _getShuffledArr = (arr) => {
         const newArr = arr.slice();
         for (let i = newArr.length - 1; i > 0; i -= i) {
             const rand = Math.floor(Math.random() * (i + 1));
@@ -50,7 +44,7 @@ class Lyrics {
                 var spans = [];
                 for (var i in elements) if (elements[i].tagName === "P") spans.push(elements[i].querySelector("span"));
                 var string = "";
-                for (var i in spans) if (spans[i]) string += spans[i].innerHTML;
+                for (var i in spans) if (spans[i]) string += spans[i].innerHTML + "\n";
                 if (typeof string !== "string") string = null;
                 resolve(string);
             } catch(e) {
@@ -64,20 +58,7 @@ class Lyrics {
         artist = this._parseString(artist);
         song = this._parseString(song);
         const string = `${artist}/${song}`;
-        /*
-        const queryes = this.getShuffledArr([
-            encodeURIComponent(`${artist} ${song} song`),
-            encodeURIComponent(`${artist} ${song} lyrics`),
-            encodeURIComponent(`${artist} ${song} song lyrics`),
-            encodeURIComponent(`${artist} ${song}`),
-        ]);
-        var res;
-        for (var i in queryes) {
-            res = await this._search(queryes[i])
-            if (res) break;
-        }
-        */
-        var res = await this._search(`${this.url}/${string}`);
+        var res = await this._search(`${this.musixmatch}/${string}`);
         if (!res) {
             var link = await this.getTrackLyricUrl(song, artist, album)
             link = link.split("?")[0];
@@ -87,11 +68,7 @@ class Lyrics {
         return res;
     }
 
-    /**
-     * Musix match section
-     */
-
-    errorHandling(code) {
+    _errorHandling(code) {
         code = Number(code);
         const errors = {
             // 200: "The request was successful.",
@@ -119,20 +96,20 @@ class Lyrics {
         this.apiRequest.url = `https://api.musixmatch.com/ws/1.1/matcher.track.get?apikey=${this.key}&${string}`;
         
         let data = await request.get(this.apiRequest);
-        if (this.errorHandling(data.message.header.status_code)) return { track_id: false, code: data.message.header.status_code };
+        if (this._errorHandling(data.message.header.status_code)) return { track_id: false, code: data.message.header.status_code };
         return data.message.body.track;
     }
 
     async _getTrackLyrics(name, artist, album) {
         const track = await this.getTrackInfo(name, artist, album)
-        if (!track.track_id) return this.errorHandling(track.code);
+        if (!track.track_id) return this._errorHandling(track.code);
         const id = track.track_id;
         const commontrack_id = track.commontrack_id;
         let string = `track_id=${id}&commontrack_id=${commontrack_id}`;
 
         this.apiRequest.url = `https://api.musixmatch.com/ws/1.1/track.lyrics.get?apikey=${this.key}&${string}`;
         let data = await request.get(this.apiRequest);
-        const error = this.errorHandling(data.message.header.status_code);
+        const error = this._errorHandling(data.message.header.status_code);
         if (error) return error;
 
         const lyrics = data.message.body.lyrics;
