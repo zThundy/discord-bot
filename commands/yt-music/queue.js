@@ -89,12 +89,13 @@ const GetQueueDescription = (songs, minIndex, maxIndex) => {
 
     for (var i in songs) {
         if ((Number(i) + 1) <= maxIndex && (Number(i) + 1) >= minIndex) {
-            if (songs[i].title.length >= 40) songs[i].title = songs[i].title.slice(0, 40) + "...";
+            var title = songs[i].title
+            if (title.length >= 40) title = title.slice(0, 40) + "...";
 
             if (songs[i].allowRatings) {
-                description += `[${(Number(i) + 1)}] ${songs[i].title} - ${FormatNumber(songs[i].likes)} 👍\n`;
+                description += `[${(Number(i) + 1)}] ${title} - ${FormatNumber(songs[i].likes)} 👍\n`;
             } else {
-                description += `[${(Number(i) + 1)}] ${songs[i].title} - No 👍 😢\n`;
+                description += `[${(Number(i) + 1)}] ${title} - No 👍 😢\n`;
             }
         }
     }

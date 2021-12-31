@@ -27,10 +27,16 @@ export async function run(client, args, message) {
         if (song.spotifyInfo.artists && song.spotifyInfo.artists[0]) song.author.name = song.spotifyInfo.artists[0].name;
     }
 
-    const lyrics = await client.lyrics.getTrackLyrics(song.title, song.author.name, song.albumName);
-
-    let embed = new MessageEmbed()
-        .setDescription(lyrics)
-        .setColor("#6600CC")
-    message.channel.send({ embed });
+    try {
+        const lyrics = await client.lyrics.getTrackLyrics(song.title, song.author.name, song.albumName);
+        let embed = new MessageEmbed()
+            .setDescription(lyrics)
+            .setColor("#6600CC")
+        message.channel.send({ embed });
+    } catch(e) {
+        let embed = new MessageEmbed()
+            .setDescription("Nothing found. Sorry 😔")
+            .setColor("#6600CC")
+        message.channel.send({ embed });
+    }
 }

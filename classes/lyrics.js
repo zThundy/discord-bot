@@ -29,6 +29,7 @@ class Lyrics {
             string.trim();
             string += second_artist;
         }
+        string = string.replace("(Official Video)", "");
         string = string.replace(/([!?$%])/g, "");
         string = string.trim();
         string = string.replace(/ /g, "-");
