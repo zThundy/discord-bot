@@ -7,30 +7,35 @@ export function getCommandInfo() {
     }
 }
 
-export async function run(client, args, message) {
-    let cachedValue = args[1];
-    var volume = client.player.getVolume();
-    volume = Math.round((volume + Number.EPSILON) * 100) / 100
+function _round(n) {
+    n = Number(n);
+    return Math.round((n + Number.EPSILON) * 100) / 100
+}
 
+export async function run(client, args, message) {
+    let newVolume = args[1];
+    var oldVolume = client.player.getVolume();
+
+    // here we check if a user is giving a new volume level; if yes
+    // then we print the changing volume message
     var string;
-    if (args[1] === null || args[1] === undefined) {
-        string = `Current volume value is: **${Math.floor(volume * 100)}**`;
-        args[1] = volume;
+    if (!newVolume) {
+        newVolume = _round(oldVolume);
+        string = `Current volume value is: **${newVolume * 100}**`;
     } else {
-        string = `Changing volume value from **${Math.floor(volume * 100)}** to **${args[1]}**`;
+        string = `Changing volume value from **${Math.floor(oldVolume * 100)}** to **${newVolume}**`;
     }
 
-    args[1] = Number(args[1]);
-    args[1] = args[1] / 100;
-    args[1] = Math.round((args[1] + Number.EPSILON) * 100) / 100
-    if (!(args[1] <= 1.0 && args[1] >= 0.01)) {
-        if (isNaN(args[1])) {
-            string = `**${cachedValue}** is not a valid value`;
-        } else {
-            string = `You can't change the volume value to **${Math.floor(args[1] * 100)}**`;
-        }
+    // convert the newVolume string to a number for future transformations
+    newVolume = Number(newVolume);
+    // with this conditional we check if the given value is a number.
+    newVolume = isNaN(newVolume) ? false : _round(newVolume);
+    // with this check, we filter all the values a user can't type in
+    if (!newVolume && !(newVolume <= 1.0 && newVolume >= 0.01)) {
+        string = `You can't change the volume value to **${args[1]}**`;
     } else {
-        client.player.setVolume(args[1]);
+        if (oldVolume !== newVolume) newVolume = _round(newVolume) / 100;
+        client.player.setVolume(newVolume);
     }
 
     let embed = new MessageEmbed()
