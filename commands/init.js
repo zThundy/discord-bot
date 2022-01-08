@@ -6,9 +6,9 @@ let timeouts = {};
 
 export function GetCommands() { return paths; }
 
-export function UnregisterCommand(client, path) {
-    paths = paths.filter(filterPath => filterPath.path != path)
-    client.commands.delete(path);
+export function UnregisterCommand(client, path, command) {
+    paths = paths.filter(filterPath => filterPath.path !== path);
+    client.commands = client.commands.filter((_, _command) => { return _command !== command });
 }
 
 export function GetCommand(command) { return paths.filter(path => path.module == command) }

@@ -15,7 +15,7 @@ export async function run(client, args, message) {
         try {
             let command = GetCommand(args[1]);
             if (command[0]) {
-                UnregisterCommand(client, command[0].path);
+                UnregisterCommand(client, command[0].path, args[1]);
                 RegisterCommand(client, command[0].path, command[0].module + ".js");
                 let embed = new MessageEmbed()
                     .setDescription("Module reloaded ♻️")
