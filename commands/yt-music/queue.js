@@ -29,6 +29,7 @@ const CreateQueueMessage = async (client, args, message) => {
                 queueMessages[message.guild.id] = msg;
                 return;
             };
+
             msg.react("⏪").then(() => {
                 msg.react("◀️").then(() => {
                     msg.react("▶️").then(() => {
@@ -47,20 +48,15 @@ const CreateQueueMessage = async (client, args, message) => {
     }
 }
 
-export async function reactionAdd(client, reactionMessage, user) {
+function _shiftQueue(client, reactionMessage, user) {
     let message = reactionMessage.message;
     let songs = client.player.getSongs();
-
-    if (songs.length == 0) {
-        delete queueMessages[message.guild.id];
-        return;
-    }
-
+    if (songs.length == 0) { delete queueMessages[message.guild.id]; return; }
     if (queueMessages[message.guild.id] && queueMessages[message.guild.id].id == message.id) {
-        reactionMessage.message.reactions.resolve("⏪").users.remove(user.id);
-        reactionMessage.message.reactions.resolve("◀️").users.remove(user.id);
-        reactionMessage.message.reactions.resolve("▶️").users.remove(user.id);
-        reactionMessage.message.reactions.resolve("⏩").users.remove(user.id);
+        // reactionMessage.message.reactions.resolve("⏪").users.remove(user.id);
+        // reactionMessage.message.reactions.resolve("◀️").users.remove(user.id);
+        // reactionMessage.message.reactions.resolve("▶️").users.remove(user.id);
+        // reactionMessage.message.reactions.resolve("⏩").users.remove(user.id);
 
         if (reactionMessage.emoji.name == "⏪") {
             queueIndex[message.guild.id] = 1;
@@ -69,11 +65,20 @@ export async function reactionAdd(client, reactionMessage, user) {
             queueIndex[message.guild.id]--;
         } else if (reactionMessage.emoji.name == "▶️") {
             if (queueIndex[message.guild.id] == songs.length) return;
+            console.log("(queueIndex[message.guild.id] + config.musicPlayer.queueMaxView)", (queueIndex[message.guild.id] + config.musicPlayer.queueMaxView))
+            console.log("queueIndex[message.guild.id]", queueIndex[message.guild.id])
+            console.log("config.musicPlayer.queueMaxView", config.musicPlayer.queueMaxView)
+            console.log("songs.length", songs.length)
             if ((queueIndex[message.guild.id] + config.musicPlayer.queueMaxView) >= songs.length) return;
             queueIndex[message.guild.id]++;
         } else if (reactionMessage.emoji.name == "⏩") {
+            console.log("(queueIndex[message.guild.id] + config.musicPlayer.queueMaxView)", (queueIndex[message.guild.id] + config.musicPlayer.queueMaxView))
+            console.log("queueIndex[message.guild.id]", queueIndex[message.guild.id])
+            console.log("config.musicPlayer.queueMaxView", config.musicPlayer.queueMaxView)
+            console.log("songs.length", songs.length)
             if ((queueIndex[message.guild.id] + config.musicPlayer.queueMaxView) >= songs.length) return;
-            queueIndex[message.guild.id] = songs.length;
+            queueIndex[message.guild.id] = songs.length - config.musicPlayer.queueMaxView;
+            if (queueIndex[message.guild.id] < 0) queueIndex[message.guild.id] = 1;
         }
 
         let description = GetQueueDescription(songs, queueIndex[message.guild.id], (config.musicPlayer.queueMaxView - 1) + queueIndex[message.guild.id]);
@@ -83,6 +88,9 @@ export async function reactionAdd(client, reactionMessage, user) {
         queueMessages[message.guild.id].edit({ embed });
     }
 }
+
+export async function reactionAdd(client, reactionMessage, user) { _shiftQueue(client, reactionMessage, user); }
+export async function reactionRemove(client, reactionMessage, user) { _shiftQueue(client, reactionMessage, user); }
 
 const GetQueueDescription = (songs, minIndex, maxIndex) => {
     let description = "";
