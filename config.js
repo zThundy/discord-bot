@@ -6,7 +6,7 @@ export default {
         secret: "YOUR_SPOTIFY_SECRET_HERE"
     },
     lyrics: {
-        token: "347108dbdc282575370220b350da55da"
+        token: "YOUR_MUSIXMATCH_TOKEN_HERE"
     },
     musicPlayer: {
         defaultVolume: 0.5,
