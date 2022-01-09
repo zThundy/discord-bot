@@ -1,5 +1,3 @@
-import config from "./../config.js";
-
 export async function run(client, args, message) {
     const fields = []
     var embed = {}
@@ -9,7 +7,7 @@ export async function run(client, args, message) {
         if (command.getCommandInfo) {
             const info = command.getCommandInfo();
             fields.push({
-                name: config.prefix + info.command,
+                name: client.config.prefix + info.command,
                 value: info.description + "\n`❓ Has arguments: " + (info.args ? "✅" : "❌") + "`"
             });
             commandsArgs[info.command] = info.args;
@@ -27,13 +25,13 @@ export async function run(client, args, message) {
 
         argsFields.push({
             name: "🔎 Expample",
-            value: "`" + config.prefix + args[1] + " " + commandsArgs[args[1]][0].name + "`"
+            value: "`" + client.config.prefix + args[1] + " " + commandsArgs[args[1]][0].name + "`"
         })
 
         embed = {
             color: "#000000",
             title: 'Arguments list',
-            description: 'Possible arguments for command ' + config.prefix + args[1],
+            description: 'Possible arguments for command ' + client.config.prefix + args[1],
             fields: argsFields,
             footer: {
                 text: 'Made with ❤️ by zThundy__',

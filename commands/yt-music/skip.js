@@ -1,6 +1,3 @@
-import { MessageEmbed } from "discord.js";
-import config from "./../../config.js";
-
 export function getCommandInfo() {
     return {
         command: "skip",

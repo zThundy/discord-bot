@@ -1,6 +1,5 @@
 import { MessageEmbed } from "discord.js";
 import { FormatNumber } from "./../../classes/utils.js";
-import config from "./../../config.js";
 
 let queueMessages = {};
 let queueIndex = {};
@@ -20,12 +19,12 @@ const CreateQueueMessage = async (client, args, message) => {
     let songs = client.player.getSongs();
     if (songs && songs[0]) {
         queueIndex[message.guild.id] = 1;
-        let description = GetQueueDescription(songs, queueIndex[message.guild.id], (config.musicPlayer.queueMaxView - 1) + queueIndex[message.guild.id]);
+        let description = GetQueueDescription(songs, queueIndex[message.guild.id], (client.config.musicPlayer.queueMaxView - 1) + queueIndex[message.guild.id]);
         let embed = new MessageEmbed()
             .setTitle("Queue for " + message.guild.name)
             .setDescription("```" + description + "```");
         message.channel.send({ embed }).then(msg => {
-            if (songs.length < config.musicPlayer.queueMaxView) {
+            if (songs.length < client.config.musicPlayer.queueMaxView) {
                 queueMessages[message.guild.id] = msg;
                 return;
             };
@@ -65,23 +64,23 @@ function _shiftQueue(client, reactionMessage, user) {
             queueIndex[message.guild.id]--;
         } else if (reactionMessage.emoji.name == "▶️") {
             if (queueIndex[message.guild.id] == songs.length) return;
-            console.log("(queueIndex[message.guild.id] + config.musicPlayer.queueMaxView)", (queueIndex[message.guild.id] + config.musicPlayer.queueMaxView))
+            console.log("(queueIndex[message.guild.id] + client.config.musicPlayer.queueMaxView)", (queueIndex[message.guild.id] + client.config.musicPlayer.queueMaxView))
             console.log("queueIndex[message.guild.id]", queueIndex[message.guild.id])
-            console.log("config.musicPlayer.queueMaxView", config.musicPlayer.queueMaxView)
+            console.log("client.config.musicPlayer.queueMaxView", client.config.musicPlayer.queueMaxView)
             console.log("songs.length", songs.length)
-            if ((queueIndex[message.guild.id] + config.musicPlayer.queueMaxView) >= songs.length) return;
+            if ((queueIndex[message.guild.id] + client.config.musicPlayer.queueMaxView) >= songs.length) return;
             queueIndex[message.guild.id]++;
         } else if (reactionMessage.emoji.name == "⏩") {
-            console.log("(queueIndex[message.guild.id] + config.musicPlayer.queueMaxView)", (queueIndex[message.guild.id] + config.musicPlayer.queueMaxView))
+            console.log("(queueIndex[message.guild.id] + client.config.musicPlayer.queueMaxView)", (queueIndex[message.guild.id] + client.config.musicPlayer.queueMaxView))
             console.log("queueIndex[message.guild.id]", queueIndex[message.guild.id])
-            console.log("config.musicPlayer.queueMaxView", config.musicPlayer.queueMaxView)
+            console.log("client.config.musicPlayer.queueMaxView", client.config.musicPlayer.queueMaxView)
             console.log("songs.length", songs.length)
-            if ((queueIndex[message.guild.id] + config.musicPlayer.queueMaxView) >= songs.length) return;
-            queueIndex[message.guild.id] = songs.length - config.musicPlayer.queueMaxView;
+            if ((queueIndex[message.guild.id] + client.config.musicPlayer.queueMaxView) >= songs.length) return;
+            queueIndex[message.guild.id] = songs.length - client.config.musicPlayer.queueMaxView;
             if (queueIndex[message.guild.id] < 0) queueIndex[message.guild.id] = 1;
         }
 
-        let description = GetQueueDescription(songs, queueIndex[message.guild.id], (config.musicPlayer.queueMaxView - 1) + queueIndex[message.guild.id]);
+        let description = GetQueueDescription(songs, queueIndex[message.guild.id], (client.config.musicPlayer.queueMaxView - 1) + queueIndex[message.guild.id]);
         let embed = new MessageEmbed()
             .setTitle("Queue for " + message.guild.name)
             .setDescription("```" + description + "```");

@@ -3,7 +3,6 @@ import ytdl from "ytdl-core";
 import ytsr from "ytsr";
 import config from "../config.js";
 import Spotify from "./spotify.js";
-import { MessageEmbed } from "discord.js";
 import { log } from "./utils.js";
 
 const spotify = new Spotify(config.spotify);

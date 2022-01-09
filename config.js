@@ -1,19 +1,26 @@
 export default {
     token: "YOUR_DISCORD_TOKEN_HERE",
     prefix: "!!",
+
+    // token | Discord dev application token, https://discord.com/developers/applications
+
     spotify: {
-        clientId: "YOUR_SPOTIFY_ID_HERE",
-        secret: "YOUR_SPOTIFY_SECRET_HERE"
+        // clientId | Client ID of your spotify application, https://developer.spotify.com/dashboard/applications
+        // secret | The secret key of your spotify application, https://developer.spotify.com/dashboard/applications
     },
+
     lyrics: {
-        token: "YOUR_MUSIXMATCH_TOKEN_HERE"
+        // token | Your musixmatch application token, https://developer.musixmatch.com/
     },
+
     musicPlayer: {
+        // defaultVolume | from 0.01 to 1.00
         defaultVolume: 0.5,
-        queueMaxView: 10,
+        queueMaxView: 10
     },
+
     timeouts: {
-        timeBetweenCommands: 3, // in seconds
+        // timeBetweenCommands | in seconds
     },
-    admins: ["YOUR_ADMIN_ID_HERE", "YOUR_OTHER_ADMIN_ID_HERE"],
+    
 }

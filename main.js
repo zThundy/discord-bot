@@ -19,6 +19,7 @@ client.on("ready", () => {
     client.lyrics = new Lyrics(config.lyrics);
     client.player = new Player(client);
     client.timeouts = new Timeouts();
+    client.config = config;
     console.log(colors.changeBackground("green", "Bot authed successfully :)"));
     init(client, config);
 });

@@ -1,9 +1,8 @@
 import { MessageEmbed } from "discord.js";
-import config from "./../config.js";
 import { RegisterCommand, GetCommand, UnregisterCommand } from "./init.js";
 
 export async function run(client, args, message) {
-    if (config.admins.includes(message.author.id)) {
+    if (client.config.admins.includes(message.author.id)) {
         if (!args[1]) {
             let embed = new MessageEmbed()
                 .setDescription("Give me a module to reload 🚫")
