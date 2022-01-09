@@ -23,14 +23,14 @@ export async function RegisterCommand(client, path, file) {
 }
 
 export async function init(client, config) {
-    fs.readdir("./commands/", async (err, files) => {
-        if (err) throw(err);
-        files.forEach(async file => {
+    fs.readdir("./commands/", (err, files) => {
+        if (err) return console.error(err);
+        files.forEach(file => {
             let status = fs.statSync("./commands/" + file);
             if (status.isDirectory()) {
-                fs.readdir("./commands/" + file, async (err, subFiles) => {
-                    if (err) throw(err);
-                    subFiles.forEach(async subFile => {
+                fs.readdir("./commands/" + file, (err, subFiles) => {
+                    if (err) return console.error(err);
+                    subFiles.forEach(subFile => {
                         let path = "./" + file + "/" + subFile;
                         RegisterCommand(client, path, subFile);
                     });
@@ -54,16 +54,15 @@ export async function init(client, config) {
             if (prop && prop.run) {
                 // timeout check per guild
                 if (!config.admins.includes(message.author.id)) {
-                    if (timeouts[message.guild.id]) {
+                    let timeout = client.timeouts.hasTimeout(message.guild.id);
+                    if (timeout) {
                         let embed = new MessageEmbed()
                             .setDescription("Give me some time to think 😧")
                             .setColor("#FFFF00");
                         message.channel.send({ embed });
                         return;
                     }
-                    // timeout check per guild
-                    if (!timeouts[message.guild.id]) timeouts[message.guild.id] = true;
-                    setTimeout(() => { delete timeouts[message.guild.id]; }, config.musicPlayer.timeBetweenCommands * 1000);
+                    client.timeouts.addTimeout(message.guild.id, config.timeouts.timeBetweenCommands);
                 }
                 // main funzion trigger
                 prop.run(client, args, message);
@@ -76,10 +75,10 @@ export async function init(client, config) {
         } catch (e) { console.error(e) }
     });
 
-    client.on("messageReactionAdd", async (reactionMessage, user) => {
+    client.on("messageReactionAdd", (reactionMessage, user) => {
         try {
             if (reactionMessage.me) return;
-            paths.forEach(async file => {
+            paths.forEach(file => {
                 let command = file.module;
                 let prop = client.commands.get(command);
                 if (prop && prop.reactionAdd) prop.reactionAdd(client, reactionMessage, user);
@@ -87,9 +86,20 @@ export async function init(client, config) {
         } catch (e) { console.error(e) }
     });
 
-    client.on("guildMemberAdd", async (member) => {
+    client.on("messageReactionRemove", (reactionMessage, user) => {
         try {
-            paths.forEach(async file => {
+            if (reactionMessage.me) return;
+            paths.forEach(file => {
+                let command = file.module;
+                let prop = client.commands.get(command);
+                if (prop && prop.reactionRemove) prop.reactionRemove(client, reactionMessage, user);
+            });
+        } catch (e) { console.error(e) }
+    });
+
+    client.on("guildMemberAdd", (member) => {
+        try {
+            paths.forEach(file => {
                 let command = file.module;
                 let prop = client.commands.get(command);
                 if (prop && prop.memberJoin) prop.memberJoin(client, member);
@@ -99,7 +109,7 @@ export async function init(client, config) {
 
     client.on('voiceStateUpdate', (oldState, newState) => {
         try {
-            paths.forEach(async file => {
+            paths.forEach(file => {
                 let command = file.module;
                 let prop = client.commands.get(command);
                 if (prop && prop.userJoinChannel) prop.userJoinChannel(client, oldState, newState);
@@ -109,7 +119,7 @@ export async function init(client, config) {
 
     client.on("guildCreate", (guild) => {
         client.database.execute(`INSERT INTO servers(id) VALUES(${guild.id})`, () => {
-            paths.forEach(async file => {
+            paths.forEach(file => {
                 let command = file.module;
                 let prop = client.commands.get(command);
                 if (prop && prop.botJoinedGuild) prop.botJoinedGuild(guild);
