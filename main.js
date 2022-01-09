@@ -7,6 +7,7 @@ import Colors from "./classes/colors.js";
 import Player from "./classes/player.js";
 import Lyrics from "./classes/lyrics.js";
 import Timeouts from "./classes/timeouts.js";
+import TwitchApi from "./classes/twitch.js";
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -20,6 +21,7 @@ client.on("ready", () => {
     client.player = new Player(client);
     client.timeouts = new Timeouts();
     client.config = config;
+    client.twitch = new TwitchApi(config.twitch);
     console.log(colors.changeBackground("green", "Bot authed successfully :)"));
     init(client, config);
 });
