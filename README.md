@@ -2,7 +2,7 @@
 
 <p>
   <a href="https://github.com/zThundy/discord-bot/releases" target="_blank">
-    <img alt="Version" src="https://img.shields.io/badge/version-0.1.0-blue.svg?cacheSeconds=2592000" />
+    <img alt="Version" src="https://img.shields.io/badge/version-0.1.1-blue.svg" />
   </a>
   <a href="https://twitter.com/zthundy__" target="_blank">
     <img alt="Twitter: zthundy__" src="https://img.shields.io/twitter/follow/zthundy__.svg?style=social" />

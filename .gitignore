@@ -141,6 +141,7 @@ dist
 
 ### Custom Files ###
 log.txt
+config.js
 .vscode/
 *.db
 
