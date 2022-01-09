@@ -25,9 +25,9 @@ client.on("ready", () => {
 });
 
 client.on('shardError', error => {
-	console.error(colors.changeBackground("red", "Error on connecting to discord: " + error));
+    console.error(colors.changeBackground("red", "Error on connecting to discord: " + error));
 });
 
 client.on('unhandledRejection', error => {
-	console.error(colors.changeBackground("red", "Error on connecting to discord: " + error));
+    console.error(colors.changeBackground("red", "Error on connecting to discord: " + error));
 });
