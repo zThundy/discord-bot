@@ -6,20 +6,20 @@ import SQL from "./classes/sqlite.js";
 import Colors from "./classes/colors.js";
 import Player from "./classes/player.js";
 import Lyrics from "./classes/lyrics.js";
+import Timeouts from "./classes/timeouts.js";
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 client.login(config.token);
 
-const database = new SQL();
 const colors = new Colors();
-const lyrics = new Lyrics(config.lyrics);
 
 client.on("ready", () => {
-    console.log(colors.changeBackground("green", "Bot authed successfully :)"));
-    client.database = database;
-    client.lyrics = lyrics;
+    client.database = new SQL();
+    client.lyrics = new Lyrics(config.lyrics);
     client.player = new Player(client);
+    client.timeouts = new Timeouts();
+    console.log(colors.changeBackground("green", "Bot authed successfully :)"));
     init(client, config);
 });
 
