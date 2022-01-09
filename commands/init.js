@@ -2,7 +2,6 @@ import fs from "fs";
 import { MessageEmbed } from "discord.js"
 
 let paths = [];
-let timeouts = {};
 
 export function GetCommands() { return paths; }
 
@@ -52,18 +51,17 @@ export async function init(client, config) {
             let command = args[0].replace(config.prefix, "").toLowerCase();
             let prop = client.commands.get(command);
             if (prop && prop.run) {
-                // timeout check per guild
-                if (!config.admins.includes(message.author.id)) {
-                    let timeout = client.timeouts.hasTimeout(message.guild.id);
-                    if (timeout) {
-                        let embed = new MessageEmbed()
-                            .setDescription("Give me some time to think 😧")
-                            .setColor("#FFFF00");
-                        message.channel.send({ embed });
-                        return;
-                    }
-                    client.timeouts.addTimeout(message.guild.id, config.timeouts.timeBetweenCommands);
+                // use the custom class made for checking timeouts
+                // to create or check timeout for a specific user
+                let timeout = client.timeouts.hasTimeout(message.author.id);
+                if (timeout) {
+                    let embed = new MessageEmbed()
+                        .setDescription("Give me some time to think 😧")
+                        .setColor("#FFFF00");
+                    message.channel.send({ embed });
+                    return;
                 }
+                client.timeouts.addTimeout(message.author.id, config.timeouts.timeBetweenCommands);
                 // main funzion trigger
                 prop.run(client, args, message);
             } else {
