@@ -2,13 +2,13 @@ export default {
     prefix: "!!",
 
     // token | Discord dev application token, https://discord.com/developers/applications
-    token: "YOUR_DISCORD_TOKEN_HERE",
+    token: "ODA2OTI5Mzk0NjA1MDk3MDAx.YBwljw.v0ky7rzUZi3jMrgkf1_SHF3u4kM",
 
     spotify: {
         // clientId | Client ID of your spotify application, https://developer.spotify.com/dashboard/applications
-        clientId: "YOUR_SPOTIFY_ID_HERE",
+        clientId: "4233862fa0ae473a88e1161ec3a0f2e5",
         // secret | The secret key of your spotify application, https://developer.spotify.com/dashboard/applications
-        secret: "YOUR_SPOTIFY_SECRET_HERE"
+        secret: "b03c74b0f93645b58e258cf10be27c94"
     },
 
     lyrics: {
@@ -39,5 +39,5 @@ export default {
     },
     
     // a list of all the admins for the bot
-    admins: ["YOUR_ADMIN_ID_HERE", "YOUR_OTHER_ADMIN_ID_HERE"]
+    admins: ["341296805646041100"]
 }
