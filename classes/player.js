@@ -217,7 +217,9 @@ class Player {
                     .on("pause", () => { console.log("stream in pause") }) ;
                 dispatcher.setVolume(volume);
                 this.queue[this.message.guild.id].setValue("dispatcher", dispatcher);
-                this.queue[this.message.guild.id].dequeue();
+                // check if there's a song looping to dequeue the first from the songs list
+                const loop = this.queue[this.message.guild.id].getValue("loop");
+                if (!loop) this.queue[this.message.guild.id].dequeue();
             }
         } catch(e) {
             log("Error on playing song: " + e);
@@ -228,41 +230,37 @@ class Player {
      * Main function. Use this with arguments to start fetching and playing whatever song you want
      */
     async play(args) {
-        // start downloading the first song of the queue
-        this._fetchInformations(args)
-        .then(song => {
-            // download song found by the youtube search query
-            this._downloadFirst(song)
-            .then(local_link => {
-                // save the local generated link
-                song.local_link = local_link;
-                // enqueue the song with all the informations
-                this.queue[this.message.guild.id].enqueue(song)
-                .then(() => {
-                    this.message.react("✅")
+        return new Promise((resolve, reject) => {
+            // start downloading the first song of the queue
+            this._fetchInformations(args)
+            .then(song => {
+                // download song found by the youtube search query
+                this._downloadFirst(song)
+                .then(local_link => {
+                    // save the local generated link
+                    song.local_link = local_link;
+                    // enqueue the song with all the informations
+                    this.queue[this.message.guild.id].enqueue(song)
                     .then(() => {
+                        resolve();
                         this._start();
+                    })
+                    .catch(e => {
+                        let string;
+                        switch(e) {
+                            case "no-song-queued":
+                                string = "No song currently queued";
+                                break;
+                            default:
+                                string = "There has been an error. Please try again later\n\n`Trace: " + e + "`";
+                        }
+                        
+                        log(string);
+                        reject(e);
                     });
-                })
-                .catch(e => {
-                    let string = "";
-                    switch(e) {
-                        case "no-song-queued":
-                            string = "No song currently queued";
-                            break;
-                        default:
-                            string = "There has been an error. Please try again later\n\n`Trace: " + e + "`";
-                    }
-                    
-                    let embed = new MessageEmbed()
-                        .setDescription(string)
-                        .setColor("#FF0000");
-                    this.message.channel.send({ embed });
-                    log(string);
-                });
-            });
+                }).catch(e => reject(e));
+            }).catch(e => reject(e));
         })
-        .catch(e => console.error(e));
     }
 
     skip() {
@@ -270,7 +268,9 @@ class Player {
         if (this.queue[this.message.guild.id].getNowplaying()) {
             const dispatcher = this.queue[this.message.guild.id].getValue("dispatcher");
             dispatcher.end();
+            return true;
         }
+        return false;
     }
 
     loop() {
@@ -278,15 +278,7 @@ class Player {
         const loop = this.queue[this.message.guild.id].getValue("loop");
         const nowplaying = this.queue[this.message.guild.id].getNowplaying();
         this.queue[this.message.guild.id].setValue("loop", !loop);
-        let string;
-        if (loop)
-            string = `Stopped looping of **${nowplaying.title}**`;
-        else
-            string = `Now looping **${nowplaying.title}**`;
-        let embed = new MessageEmbed()
-            .setDescription(string)
-            .setColor("#FFFF00");
-        this.message.channel.send({ embed });
+        return [loop, nowplaying];
     }
 
     stop() {
