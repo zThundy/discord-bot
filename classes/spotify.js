@@ -1,4 +1,4 @@
-// functions and logic taken from https://github.com/thearkxd/spotify-info.js
+// base class taken from https://github.com/thearkxd/spotify-info.js
 import request from "request-promise";
 
 class SpotifyClass {
