@@ -9,7 +9,7 @@ class Timeouts {
     }
 
     addTimeout(id, time, start, end) {
-        // if (config.admins.includes(message.author.id)) return;
+        if (config.admins.includes(message.author.id)) return;
         let _id = id || MakeID(10);
         let _time = isNaN(Number(time)) ? 5000 : Number(time * 1000);
         let _start, _end;
