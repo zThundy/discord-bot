@@ -38,6 +38,13 @@ export async function run(client, args, message) {
     }
     // QueueSong(client, args, message, voiceChannel, true);
     client.player.play(args)
+        .then(message.react("✅"))
+        .catch(e => {
+            let embed = new MessageEmbed()
+                .setDescription(e)
+                .setColor("#FF0000");
+            this.message.channel.send({ embed });
+        });
 }
 
 export async function userJoinChannel(client, oldState, newState) {

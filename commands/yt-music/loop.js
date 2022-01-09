@@ -1,3 +1,5 @@
+import { MessageEmbed } from "discord.js";
+
 export function getCommandInfo() {
     return {
         command: "loop",
@@ -6,5 +8,11 @@ export function getCommandInfo() {
 }
 
 export async function run(client, args, message) {
-    client.player.loop();
+    const [loop, nowplaying] = client.player.loop();
+    let string = `Now looping **${nowplaying.title}**`;
+    if (loop) string = `Stopped looping of **${nowplaying.title}**`;
+    let embed = new MessageEmbed()
+        .setDescription(string)
+        .setColor("#FFFF00");
+    message.channel.send({ embed });
 }

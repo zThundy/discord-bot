@@ -1,6 +1,6 @@
 import fs from "fs";
 
-export function FormatNumber (value) {
+export function FormatNumber(value) {
     var newValue = value;
     if (value >= 1000) {
         var suffixes = ["", "k", "m", "b","t"];
@@ -43,4 +43,12 @@ export function FormatToMysql(time) {
 export function IsSpotifyPlaylist(url) {
     if (url.includes("/playlist/")) return true;
     return false;
+}
+
+export function MakeID(length) {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    return result;
 }

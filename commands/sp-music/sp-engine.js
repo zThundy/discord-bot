@@ -9,8 +9,14 @@ var buisy = false;
 function _ElaborateQueue(client, songs, message, voiceChannel) {
     if (songs && songs.length > 0) {
         const song = songs.shift();
-        client.player.play(song);
-        // QueueSong(client, song, message, voiceChannel, false);
+        client.player.play(song)
+            .then(message.react("✅"))
+            .catch(e => {
+                let embed = new MessageEmbed()
+                    .setDescription(e)
+                    .setColor("#FF0000");
+                this.message.channel.send({ embed });
+            });
         setTimeout(() => { _ElaborateQueue(client, songs, message, voiceChannel); }, 30 * 1000)
     } else {
         buisy = false
@@ -35,8 +41,14 @@ export async function SearchSongName(client, args, message, voiceChannel) {
             args = [args[0], songInfo.name, songInfo.artists[0].name];
         else
             args = [args[0], songInfo.name];
-        client.player.play(args);
-        // QueueSong(client, args, message, voiceChannel, true);
+        client.player.play(args)
+            .then(message.react("✅"))
+            .catch(e => {
+                let embed = new MessageEmbed()
+                    .setDescription(e)
+                    .setColor("#FF0000");
+                this.message.channel.send({ embed });
+            });
     } catch (e) {
         console.error(e)
         let embed = new MessageEmbed()
