@@ -19,13 +19,15 @@ export default {
     musicPlayer: {
         // defaultVolume | from 0.01 to 1.00
         defaultVolume: 0.5,
+        // queueMaxView | how many songs will be shown on the queue command response
         queueMaxView: 10
     },
 
     timeouts: {
-        // timeBetweenCommands | in seconds
+        // timeBetweenCommands | The time need to pass between commands (if the user is not admin)
         timeBetweenCommands: 3
     },
     
+    // a list of all the admins for the bot
     admins: ["YOUR_ADMIN_ID_HERE", "YOUR_OTHER_ADMIN_ID_HERE"]
 }
