@@ -13,7 +13,17 @@ export default {
 
     lyrics: {
         // token | Your musixmatch application token, https://developer.musixmatch.com/
-        token: "YOUR_MUSIXMATCH_TOKEN_HERE"
+    },
+
+    twitch: {
+        // clientId | Client ID of your twitch application, https://dev.twitch.tv/console/apps
+        clientId: "YOUR_CLIENT_ID_HERE",
+        // secret | The secret key of your twitch application, https://dev.twitch.tv/console/apps
+        secret: "YOUR_SECRET_HERE",
+        // redirUri | The url you setup in your developer console, https://dev.twitch.tv/console/apps
+        redirUri: "YOUR_REDIRECT_URI_HERE",
+        // channelNames | include all the twitch channel names you want to check
+        channelNames: ["CHANNEL_NAME_1", "CHANNEL_NAME_2", "CHANNEL_NAME_3"]
     },
 
     musicPlayer: {
