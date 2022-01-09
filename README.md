@@ -1,5 +1,14 @@
 # DiscordJs v-12.x bot
 
+<p>
+  <a href="https://github.com/zThundy/discord-bot/releases" target="_blank">
+    <img alt="Version" src="https://img.shields.io/badge/version-0.1.0-blue.svg?cacheSeconds=2592000" />
+  </a>
+  <a href="https://twitter.com/zthundy__" target="_blank">
+    <img alt="Twitter: zthundy__" src="https://img.shields.io/twitter/follow/zthundy__.svg?style=social" />
+  </a>
+</p>
+
 This open source project is a node package made to have a personal discord bot to play music from youtube and spotify.
 
 ## Installation
@@ -26,7 +35,7 @@ I suggest you tu use nodemon to run the bot if you need to edit the file and res
 npm run dev
 ```
 
-## Addon
+## Addons
 If you want to search songs from spotify, just go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/login), create your own application and use the credential on the application page and change them in the `config.js` as shown down here:
 ```js
 ...
