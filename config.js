@@ -6,13 +6,14 @@ export default {
         secret: "YOUR_SPOTIFY_SECRET_HERE"
     },
     lyrics: {
-        musixmathc: false,
-        token: "YOUR_MUSIXMATCH_TOKEN_HERE"
+        token: "347108dbdc282575370220b350da55da"
     },
     musicPlayer: {
         defaultVolume: 0.5,
+        queueMaxView: 10,
+    },
+    timeouts: {
         timeBetweenCommands: 3, // in seconds
-        queueMaxView: 5,
     },
     admins: ["YOUR_ADMIN_ID_HERE", "YOUR_OTHER_ADMIN_ID_HERE"],
 }
