@@ -110,7 +110,7 @@ export async function init(client, config) {
             paths.forEach(file => {
                 let command = file.module;
                 let prop = client.commands.get(command);
-                if (prop && prop.userJoinChannel) prop.userJoinChannel(client, oldState, newState);
+                if (prop && prop.voiceUpdate) prop.voiceUpdate(client, oldState, newState);
             });
         } catch (e) { console.error(e) }
     });

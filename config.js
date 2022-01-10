@@ -20,7 +20,9 @@ export default {
         // defaultVolume | from 0.01 to 1.00
         defaultVolume: 0.5,
         // queueMaxView | how many songs will be shown on the queue command response
-        queueMaxView: 10
+        queueMaxView: 10,
+        // quitEmptyChannel | if true, the bot will leave a channel if he is the only one inside. This will also clear the queue
+        quitEmptyChannel: true
     },
 
     timeouts: {

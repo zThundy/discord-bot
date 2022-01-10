@@ -47,10 +47,17 @@ export async function run(client, args, message) {
         });
 }
 
-export async function userJoinChannel(client, oldState, newState) {
-    if (newState.member.user.bot && client.user.id == newState.member.user.id)
-        if (!newState.serverDeaf) 
+export async function voiceUpdate(client, oldState, newState) {
+    if (newState.member.user.bot && client.user.id === newState.member.user.id)
+        if (!newState.serverDeaf)
             newState.setDeaf(true);
+
+    if (!client.config.musicPlayer.quitEmptyChannel) return;
+    let channelID = oldState.channelID || newState.channelID
+    let channel = newState.guild.channels.cache.get(channelID);
+    if (channel.members.has(client.user.id))
+        if (channel.members.size <= 1)
+            client.player.stop();
 }
 
 
