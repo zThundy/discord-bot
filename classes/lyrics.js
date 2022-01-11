@@ -52,26 +52,38 @@ class Lyrics {
                         if (typeof string !== "string") string = null;
                         resolve(string);
                     })
-                    .catch(e => { resolve(false) });
+                    .catch(e => { reject(false) });
             } catch(e) {
-                resolve(false);
+                reject(false);
             }
         });
     }
 
     async getTrackLyrics(song, artist, album) {
-        log("Attemting search of song: " + song + " by " + artist + " from the album " + album);
-        artist = this._parseString(artist);
-        song = this._parseString(song);
-        const string = `${artist}/${song}`;
-        var res = await this._search(`${this.musixmatch}${string}`);
-        if (!res) {
-            var link = await this.getTrackLyricUrl(song, artist, album)
-            link = link.split("?")[0];
-            res = await this._search(link);
-        }
-        if (!res) res = this._getTrackLyrics(song, artist, album);
-        return res;
+        return new Promise((resolve, reject) => {
+            try {
+                log("Attemting search of song: " + song + " by " + artist + " from the album " + album);
+                artist = this._parseString(artist);
+                song = this._parseString(song);
+                const string = `${artist}/${song}`;
+                this._search(`${this.musixmatch}${string}`)
+                .then(async res => {
+                    if (!res) {
+                        var link = await this.getTrackLyricUrl(song, artist, album);
+                        link = link.split("?")[0];
+                        this._search(link)
+                        .then(res => {
+                            if (!res) res = this._getTrackLyrics(song, artist, album);
+                            resolve(res);
+                        })
+                        .catch(e => reject(e));
+                    } else {
+                        resolve(res);
+                    }
+                })
+                .catch(e => reject(e));
+            } catch(e) { reject(e); }
+        });
     }
 
     _errorHandling(code) {

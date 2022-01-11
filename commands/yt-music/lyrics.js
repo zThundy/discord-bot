@@ -15,8 +15,7 @@ export async function run(client, args, message) {
         let embed = new MessageEmbed()
             .setDescription("No song playing rn 😔")
             .setColor("#FF0000");
-        message.channel.send({ embed });
-        return;
+        return message.channel.send({ embed });
     }
 
     // check if the song has been fetched from spotify, if yes
@@ -28,15 +27,18 @@ export async function run(client, args, message) {
     }
 
     try {
-        const lyrics = await client.lyrics.getTrackLyrics(song.title, song.author.name, song.albumName);
-        let embed = new MessageEmbed()
-            .setDescription(lyrics)
-            .setColor("#6600CC")
-        message.channel.send({ embed });
+        message.react("✅")
+            .then(async () => {
+                const lyrics = await client.lyrics.getTrackLyrics(song.title, song.author.name, song.albumName);
+                let embed = new MessageEmbed()
+                    .setDescription(lyrics)
+                    .setColor("#6600CC");
+                message.channel.send({ embed });
+            });
     } catch(e) {
         let embed = new MessageEmbed()
             .setDescription("Nothing found. Sorry 😔")
-            .setColor("#6600CC")
+            .setColor("#6600CC");
         message.channel.send({ embed });
     }
 }
