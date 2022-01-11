@@ -1,27 +1,30 @@
 import fs from "fs";
-import { MessageEmbed } from "discord.js"
+import { MessageEmbed } from "discord.js";
+import Colors from "../classes/colors.js";
+const colors = new Colors();
 
 let paths = [];
 
 export function GetCommands() { return paths; }
+export function GetCommand(command) { return paths.filter(path => path.module == command) }
 
 export function UnregisterCommand(client, path, command) {
     paths = paths.filter(filterPath => filterPath.path !== path);
     client.commands = client.commands.filter((_, _command) => { return _command !== command });
 }
 
-export function GetCommand(command) { return paths.filter(path => path.module == command) }
-
 export async function RegisterCommand(client, path, file) {
-    if (!file.endsWith(".js") || file.startsWith("init")) return;
+    console.log(colors.changeColor("yellow", "[Info] Trying to load command " + file));
+    if (!file.endsWith(".js")) return;
     let props = await import(path);
+    if (!props.init && !props.run) return;
     paths.push({ path: path, module: file.split(".")[0] });
-    console.info("\x1b[33m[Info] Comando caricato: " + file + "\x1b[0m")
+    console.log(colors.changeColor("green", "[Info] Command " + file + " loaded"));
     client.commands.set(file.split(".")[0], props);
     if (props.init) props.init(client);
 }
 
-export async function init(client, config) {
+export async function _init(client) {
     fs.readdir("./commands/", (err, files) => {
         if (err) return console.error(err);
         files.forEach(file => {
@@ -39,16 +42,20 @@ export async function init(client, config) {
                 RegisterCommand(client, path, file);
             }
         });
+        _initClient(client);
     });
+}
 
+const _initClient = (client) => {
+    console.log(colors.changeColor("yellow", "[Info] Initializing discord client handlers..."));
     client.on("message", (message) => {
         if (message.author.bot) return;
         let args = message.content.split(" ");
-        if (args[0].indexOf(config.prefix) == -1) return;
+        if (args[0].indexOf(client.config.prefix) == -1) return;
         // update player message every time a message is fired
         client.player.update(client, message);
         try {
-            let command = args[0].replace(config.prefix, "").toLowerCase();
+            let command = args[0].replace(client.config.prefix, "").toLowerCase();
             let prop = client.commands.get(command);
             if (prop && prop.run) {
                 // use the custom class made for checking timeouts
@@ -61,7 +68,7 @@ export async function init(client, config) {
                     message.channel.send({ embed });
                     return;
                 }
-                client.timeouts.addTimeout(message.author.id, config.timeouts.timeBetweenCommands);
+                client.timeouts.addTimeout(message.author.id, client.config.timeouts.timeBetweenCommands);
                 // main funzion trigger
                 prop.run(client, args, message);
             } else {
@@ -129,8 +136,9 @@ export async function init(client, config) {
         client.database.execute(`DELETE FROM servers WHERE id = '${guild.id}'`)
     });
 
-    let status = `Online on ${client.guilds.cache.size} servers | ${config.prefix}help`;
-    if (client.guilds.cache.size == 1) status = `Online on ${client.guilds.cache.size} server | ${config.prefix}help`;
+    let status = `Online on ${client.guilds.cache.size} servers | ${client.config.prefix}help`;
+    if (client.guilds.cache.size == 1) status = `Online on ${client.guilds.cache.size} server | ${client.config.prefix}help`;
 
     client.user.setPresence({ activity: { name: status }, status: 'dnd' });
+    console.log(colors.changeColor("green", "[Info] Discord client handlers initialized"));
 }

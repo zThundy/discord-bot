@@ -1,5 +1,5 @@
 import Discord from "discord.js";
-import { init } from "./commands/init.js";
+import { _init } from "./commands/init.js";
 import config from "./config.js";
 // custom classes import
 import SQL from "./classes/sqlite.js";
@@ -21,7 +21,7 @@ client.on("ready", () => {
     client.timeouts = new Timeouts();
     client.config = config;
     console.log(colors.changeBackground("green", "Bot authed successfully :)"));
-    init(client, config);
+    _init(client);
 });
 
 client.on('shardError', error => {
