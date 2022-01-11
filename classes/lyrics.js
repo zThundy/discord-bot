@@ -33,21 +33,26 @@ class Lyrics {
         string = string.replace(/([!?$%])/g, "");
         string = string.trim();
         string = string.replace(/ /g, "-");
+        string = string.replace(/([*])/g, "-");
         return string;
     }
 
     _search(searchQuery) {
-        return new Promise(async (resolve, reject) => {
+        return new Promise((resolve, reject) => {
             try {
-                const searchResult = await request.get(searchQuery);
-                const dom = new JSDOM(searchResult);
-                const elements = dom.window.document.getElementsByClassName("mxm-lyrics__content");
-                var spans = [];
-                for (var i in elements) if (elements[i].tagName === "P") spans.push(elements[i].querySelector("span"));
-                var string = "";
-                for (var i in spans) if (spans[i]) string += spans[i].innerHTML + "\n";
-                if (typeof string !== "string") string = null;
-                resolve(string);
+                log("Lyrics get: " + searchQuery)
+                request.get(searchQuery)
+                    .then(searchResult => {
+                        const dom = new JSDOM(searchResult);
+                        const elements = dom.window.document.getElementsByClassName("mxm-lyrics__content");
+                        var spans = [];
+                        for (var i in elements) if (elements[i].tagName === "P") spans.push(elements[i].querySelector("span"));
+                        var string = "";
+                        for (var i in spans) if (spans[i]) string += spans[i].innerHTML + "\n";
+                        if (typeof string !== "string") string = null;
+                        resolve(string);
+                    })
+                    .catch(e => { resolve(false) });
             } catch(e) {
                 resolve(false);
             }
@@ -59,7 +64,7 @@ class Lyrics {
         artist = this._parseString(artist);
         song = this._parseString(song);
         const string = `${artist}/${song}`;
-        var res = await this._search(`${this.musixmatch}/${string}`);
+        var res = await this._search(`${this.musixmatch}${string}`);
         if (!res) {
             var link = await this.getTrackLyricUrl(song, artist, album)
             link = link.split("?")[0];
