@@ -28,8 +28,8 @@ export async function _init(client) {
     fs.readdir("./commands/", (err, files) => {
         if (err) return console.error(err);
         files.forEach(file => {
-            let status = fs.statSync("./commands/" + file);
-            if (status.isDirectory()) {
+            let current = fs.statSync("./commands/" + file);
+            if (current.isDirectory()) {
                 fs.readdir("./commands/" + file, (err, subFiles) => {
                     if (err) return console.error(err);
                     subFiles.forEach(subFile => {
@@ -123,6 +123,7 @@ const _initClient = (client) => {
     });
 
     client.on("guildCreate", (guild) => {
+        console.log(colors.changeColor("green", `Added in guild "${guild.name}"`))
         client.database.execute(`INSERT INTO servers(id) VALUES(${guild.id})`, () => {
             paths.forEach(file => {
                 let command = file.module;
@@ -130,15 +131,22 @@ const _initClient = (client) => {
                 if (prop && prop.botJoinedGuild) prop.botJoinedGuild(guild);
             });
         });
+        _updateStatus(client);
     });
 
     client.on("guildDelete", (guild) => {
+        console.log(colors.changeColor("red", `Removed from guild "${guild.name}"`))
         client.database.execute(`DELETE FROM servers WHERE id = '${guild.id}'`)
+        _updateStatus(client);
     });
 
-    let status = `Online on ${client.guilds.cache.size} servers | ${client.config.prefix}help`;
-    if (client.guilds.cache.size == 1) status = `Online on ${client.guilds.cache.size} server | ${client.config.prefix}help`;
-
-    client.user.setPresence({ activity: { name: status }, status: 'dnd' });
     console.log(colors.changeColor("green", "[Info] Discord client handlers initialized"));
+    _updateStatus(client);
+}
+
+const _updateStatus = (client) => {
+    var discordStatus = `Online on ${client.guilds.cache.size} servers | ${client.config.prefix}help`;
+    if (client.guilds.cache.size == 1) discordStatus = `Online on ${client.guilds.cache.size} server | ${client.config.prefix}help`;
+    console.log(colors.changeColor("magenta", `Changing current status to "${discordStatus}"`))
+    client.user.setPresence({ activity: { name: discordStatus }, status: 'dnd' });
 }
