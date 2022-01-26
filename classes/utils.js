@@ -1,4 +1,5 @@
 import fs from "fs";
+import config from "./../config.js";
 
 export function FormatNumber(value) {
     var newValue = value;
@@ -18,6 +19,7 @@ export function FormatNumber(value) {
 }
 
 export function log(message) {
+    if (!config.enableLogs) return;
     fs.readFile("log.txt", 'utf8', (err, data) => {
         var currentdate = new Date();
         var datetime = currentdate.getDate() + "/"
