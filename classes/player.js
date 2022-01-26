@@ -7,11 +7,16 @@ import { log } from "./utils.js";
 
 const spotify = new Spotify(config.spotify);
 
+/**
+ * Custom queue class
+ */
+
 class Queue {
     constructor(guild) {
         this.queue = {};
         this.queue.songs = [];
         this.queue.connection = null;
+        this.queue.currentMessage = null;
         this.queue.textChannel = null;
         this.queue.voiceChannel = null;
         this.queue.dispatcher = null;
@@ -42,6 +47,7 @@ class Queue {
                 let voiceChannel = this._message.member.voice.channel;
                 this.queue.songs.push(song);
                 this.queue.connection = await voiceChannel.join();
+                this.queue.currentMessage = this._message;
                 this.queue.textChannel = this._message.channel;
                 this.queue.voiceChannel = voiceChannel;
                 resolve();
@@ -75,6 +81,46 @@ class Queue {
     }
 }
 
+/**
+ * Custom song information caching class
+ */
+
+class Cache {
+    constructor(client) {
+        // init db shit
+        this._cache = new Map();
+        client.database.get("SELECT * FROM songs", {}, r => {
+            for (var i in r)
+                this._cache.set(r[i].id, JSON.parse(r[i].data));
+        })
+    }
+
+    getInfoCache(query) {
+        return new Promise((resolve, reject) => {
+            if (this._cache.has(query)) {
+                log("Found song data in database cache. Query: " + query);
+                resolve(this._cache.get(query));
+            } else {
+                log("No song data found in database cache. Query: " + query);
+                reject();
+            };
+        });
+    }
+
+    saveInfoCache(query, data, extradata) {
+        const guildId = extradata.guild;
+        const client = extradata.client;
+        if (!this._cache.has(query))
+            client.database.execute("INSERT INTO songs(guild, id, data) VALUES(?, ?, ?)", [guildId, query, JSON.stringify(data)]);
+        this._cache.set(query, data);
+        log("Saving data in songs database cache for query " + query);
+    }
+}
+
+/**
+ * Custom audio player class
+ */
+
 class Player {
     /**
      * 
@@ -85,6 +131,7 @@ class Player {
         client.guilds.cache.forEach(guild => {
             this.queue[guild.id] = new Queue(guild.id);
         });
+        this.cache = new Cache(client);
     }
 
     /**
@@ -122,45 +169,50 @@ class Player {
     _fetchInformations(args) {
         return new Promise(async (resolve, reject) => {
             try {
-                let songInfo;
+                let songInfo, query, spotifyInfo;
                 if (this._isSpotifyLink(args[1])) {
-                    let info;
-                    var query = await spotify.getTrackByURL(args[1]);
+                    log("Searching song using spotify API. The query given is a link.");
+                    query = await spotify.getTrackByURL(args[1]);
                     if (query.artists) {
-                        info = query;
+                        spotifyInfo = query;
                         query = query.name + " " + query.artists[0].name;
                     } else {
-                        info = query;
+                        spotifyInfo = query;
                         query = query.name;
                     }
-                    const searchResults = await ytsr(query, { limit: 1 });
-                    if (searchResults && searchResults.items)
-                        if (searchResults.items[0].url) {
-                            songInfo = await ytdl.getBasicInfo(searchResults.items[0].url);
-                            songInfo.spotify = info;
-                        }
                 } else if (!this._isYoutubeLink(args[1])) {
-                    var string = "";
+                    log("Searching song using youtube API. The query given is a string.");
                     args.shift();
-                    for (var i in args) { string += args[i] + " "; }
-                    const searchResults = await ytsr(string, { limit: 1 });
-                    if (searchResults && searchResults.items)
-                        if (searchResults.items[0].url)
-                            songInfo = await ytdl.getBasicInfo(searchResults.items[0].url);
+                    for (var i in args) { query += args[i] + " "; }
                 } else {
+                    log("Searching song using youtube API. The query given is a link.");
                     songInfo = await ytdl.getBasicInfo(args[1]);
                 }
-                let song = songInfo.videoDetails;
-                if (songInfo.spotify) song.spotifyInfo = songInfo.spotify;
-                log("Got informations for song: " + song.title);
-                resolve(song);
+                this.cache.getInfoCache(query)
+                    .then(res => {
+                        if (spotifyInfo) res.spotifyInfo = songInfo.spotify;
+                        resolve(res);
+                    })
+                    .catch(async e => {
+                        if (!songInfo) {
+                            const searchResults = await ytsr(query, { limit: 1 });
+                            if (searchResults && searchResults.items)
+                                if (searchResults.items[0].url)
+                                    songInfo = await ytdl.getBasicInfo(searchResults.items[0].url);
+                        }
+                        let song = songInfo.videoDetails;
+                        if (spotifyInfo) song.spotifyInfo = songInfo.spotify;
+                        log("Got informations for song: " + song.title);
+                        this.cache.saveInfoCache(query, song, { guild: this.message.guild.id, client: this.client });
+                        resolve(song);
+                    });
             } catch(e) { reject(e); }
         });
     }
 
     _downloadFirst(song) {
         return new Promise((resolve, reject) => {
-            const link = "./audios/" + song.videoId + ".mp3";
+            const link = "./cache/audios/" + song.videoId + ".mp3";
             try {
                 if (!fs.existsSync(link)) {
                     log("Downloading from youtube " + song.title);
@@ -293,9 +345,8 @@ class Player {
     }
 
     nowplaying() {
-        if (this.queue[this.message.guild.id].getNowplaying()) {
+        if (this.queue[this.message.guild.id].getNowplaying())
             return [this.queue[this.message.guild.id].getNowplaying(), this.queue[this.message.guild.id].getValue("loop")];
-        }
         return [false, false];
     }
 

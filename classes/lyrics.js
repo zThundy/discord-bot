@@ -52,7 +52,7 @@ class Lyrics {
                         if (typeof string !== "string") string = null;
                         resolve(string);
                     })
-                    .catch(e => { resolve(false) });
+                    .catch(e => resolve(false));
             } catch(e) { reject(false); }
         });
     }

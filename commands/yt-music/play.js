@@ -43,7 +43,7 @@ export async function run(client, args, message) {
             let embed = new MessageEmbed()
                 .setDescription(e)
                 .setColor("#FF0000");
-            this.message.channel.send({ embed });
+            message.channel.send({ embed });
         });
 }
 

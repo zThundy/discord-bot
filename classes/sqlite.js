@@ -15,6 +15,7 @@ class SQL {
         console.log(colors.changeColor("yellow", "Initializing SQLITE3 database"));
         this.db = new sqlite3.Database("./database.db");
         this.db.run("CREATE TABLE IF NOT EXISTS servers (id TEXT)");
+        this.db.run("CREATE TABLE IF NOT EXISTS songs (guild VARCHAR, id VARCHAR, data TEXT)");
     }
 
     _createHandlers() {
@@ -39,6 +40,7 @@ class SQL {
     }
 
     handleErrors(id, err, type, query, args, cb) {
+        console.error(colors.changeColor("red", "Query " + query + " generated an exeption"))
         console.error(colors.changeColor("red", "The db generated an exeption. " + err));
         console.error(colors.changeColor("red",  "Retry number " + id));
         this._init();
