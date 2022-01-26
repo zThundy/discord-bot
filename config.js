@@ -29,6 +29,10 @@ export default {
         // timeBetweenCommands | The time need to pass between commands (if the user is not admin)
         timeBetweenCommands: 3
     },
+
+    // choose if enable console and file logs or not
+    // this is useful for troubleshooting if something is not working correctly
+    enableLogs: true,
     
     // a list of all the admins for the bot
     admins: ["YOUR_ADMIN_ID_HERE", "YOUR_OTHER_ADMIN_ID_HERE"]
