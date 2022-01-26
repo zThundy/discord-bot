@@ -88,32 +88,60 @@ class Queue {
 class Cache {
     constructor(client) {
         // init db shit
-        this._cache = new Map();
+        this._cache = {};
+        client.database.execute("DELETE FROM songs")
         client.database.get("SELECT * FROM songs", {}, r => {
             for (var i in r)
-                this._cache.set(r[i].id, JSON.parse(r[i].data));
+                this._cache[r[i].id] = JSON.parse(r[i].data);
         })
     }
 
-    getInfoCache(query) {
+    getInfoCache(query, client) {
         return new Promise((resolve, reject) => {
-            if (this._cache.has(query)) {
-                log("Found song data in database cache. Query: " + query);
-                resolve(this._cache.get(query));
-            } else {
-                log("No song data found in database cache. Query: " + query);
-                reject();
-            };
+            // var result = null;
+            // for (var i in this._cache) {
+            //     i = i.toLowerCase();
+            //     query = query.toLowerCase();
+            //     if (i.includes(query)) {
+            //         result = this._cache[i];
+            //         break;
+            //     } else if (this._cache[i].video_url === query) {
+            //         result = this.cache[i];
+            //         break;
+            //     }
+            // }
+            client.database.get("SELECT * FROM songs WHERE `id` LIKE ?", [query], r => {
+                if (r && r[1]) {
+                    log("Found song data in database cache. Query: " + query);
+                    resolve(JSON.parse(r[1].data));
+                } else {
+                    log("No song data found in database cache. Query: " + query);
+                    reject();
+                }
+            });
         });
     }
 
     saveInfoCache(query, data, extradata) {
         const guildId = extradata.guild;
         const client = extradata.client;
-        if (!this._cache.has(query))
-            client.database.execute("INSERT INTO songs(guild, id, data) VALUES(?, ?, ?)", [guildId, query, JSON.stringify(data)]);
-        this._cache.set(query, data);
-        log("Saving data in songs database cache for query " + query);
+        this.getInfoCache(query, client)
+            .then(() => {
+                this._cache[query] = data;
+                log("Saving data in songs database cache for query " + query);
+            })
+            .catch(() => {
+                if (data.embed) delete data.embed;
+                if (data.availableCountries) delete data.availableCountries;
+                if (data.description) delete data.description;
+                if (data.keywords) delete data.keywords;
+                if (data.chapters) delete data.chapters;
+                if (data.storyboards) delete data.storyboards;
+                if (data.thumbnails) delete data.thumbnails;
+                this._cache[query] = data;
+                log("Saving data in songs database cache for query " + query);
+                client.database.execute("INSERT INTO songs(guild, id, data) VALUES(?, ?, ?)", [guildId, query, JSON.stringify(data)]);
+            });
     }
 }
 
@@ -183,12 +211,14 @@ class Player {
                 } else if (!this._isYoutubeLink(args[1])) {
                     log("Searching song using youtube API. The query given is a string.");
                     args.shift();
+                    query = "";
                     for (var i in args) { query += args[i] + " "; }
                 } else {
                     log("Searching song using youtube API. The query given is a link.");
-                    songInfo = await ytdl.getBasicInfo(args[1]);
+                    // songInfo = await ytdl.getBasicInfo(args[1]);
+                    query = args[1];
                 }
-                this.cache.getInfoCache(query)
+                this.cache.getInfoCache(query, this.client)
                     .then(res => {
                         if (spotifyInfo) res.spotifyInfo = songInfo.spotify;
                         resolve(res);
