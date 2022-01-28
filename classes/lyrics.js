@@ -12,6 +12,7 @@ class Lyrics {
         this.apiRequest = { url: "", json: true };
     }
 
+    /*
     _getShuffledArr = (arr) => {
         const newArr = arr.slice();
         for (let i = newArr.length - 1; i > 0; i -= i) {
@@ -20,22 +21,7 @@ class Lyrics {
         }
         return newArr;
     };
-
-    _parseString(string) {
-        if (string.includes("(feat. ")) {
-            var second_artist = string.split("(feat.")[1].split(")")[0];
-            second_artist = second_artist.trim();
-            string = string.split("(")[0];
-            string.trim();
-            string += second_artist;
-        }
-        string = string.replace("(Official Video)", "");
-        string = string.replace(/([!?$%])/g, "");
-        string = string.trim();
-        string = string.replace(/ /g, "-");
-        string = string.replace(/([*])/g, "-");
-        return string;
-    }
+    */
 
     _search(searchQuery) {
         return new Promise((resolve, reject) => {
@@ -61,8 +47,6 @@ class Lyrics {
         return new Promise((resolve, reject) => {
             try {
                 log("Attemting search of song: " + song + " by " + artist + " from the album " + album);
-                artist = this._parseString(artist);
-                song = this._parseString(song);
                 const string = `${artist}/${song}`;
                 this._search(`${this.musixmatch}${string}`)
                     .then(async res => {
@@ -144,6 +128,7 @@ class Lyrics {
     }
 
     async getTrackLyricUrl(name, artist, album) {
+        log("Getting track's " + name + " by " + artist + " url using the musixmatch api")
         const track = await this.getTrackInfo(name, artist, album)
         return track.track_share_url;
     }

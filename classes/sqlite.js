@@ -13,7 +13,7 @@ class SQL {
 
     _init() {
         console.log(colors.changeColor("yellow", "Initializing SQLITE3 database"));
-        this.db = new sqlite3.Database("./database.db");
+        this.db = new sqlite3.Database("./cache/database.db");
         this.db.run("CREATE TABLE IF NOT EXISTS servers (id TEXT)");
         this.db.run("CREATE TABLE IF NOT EXISTS songs (guild VARCHAR, id VARCHAR, data TEXT)");
     }
@@ -46,6 +46,8 @@ class SQL {
         this._init();
         if (id < this.queryRetryes) {
             setTimeout(() => { this[type](query, args, cb, Number(id + 1)); }, this.retryTimeout);
+        } else {
+            cb(null)
         }
     }
 }

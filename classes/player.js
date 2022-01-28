@@ -89,7 +89,6 @@ class Cache {
     constructor(client) {
         // init db shit
         this._cache = {};
-        client.database.execute("DELETE FROM songs")
         client.database.get("SELECT * FROM songs", {}, r => {
             for (var i in r)
                 this._cache[r[i].id] = JSON.parse(r[i].data);
@@ -128,7 +127,7 @@ class Cache {
         this.getInfoCache(query, client)
             .then(() => {
                 this._cache[query] = data;
-                log("Saving data in songs database cache for query " + query);
+                log("Found data in cache for query " + query + " updating it anyway :P");
             })
             .catch(() => {
                 if (data.embed) delete data.embed;
@@ -231,7 +230,10 @@ class Player {
                                     songInfo = await ytdl.getBasicInfo(searchResults.items[0].url);
                         }
                         let song = songInfo.videoDetails;
-                        if (spotifyInfo) song.spotifyInfo = songInfo.spotify;
+                        if (spotifyInfo) {
+                            log("Searched query has spotify informations: adding it to song array");
+                            song.spotifyInfo = spotifyInfo;
+                        }
                         log("Got informations for song: " + song.title);
                         this.cache.saveInfoCache(query, song, { guild: this.message.guild.id, client: this.client });
                         resolve(song);
