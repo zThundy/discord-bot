@@ -52,6 +52,7 @@ class Lyrics {
                     .then(async res => {
                         if (!res) {
                             var link = await this.getTrackLyricUrl(song, artist, album);
+                            if (!link) return resolve("Nothing found");
                             link = link.split("?")[0];
                             this._search(link)
                                 .then(res => {

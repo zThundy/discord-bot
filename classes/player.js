@@ -88,11 +88,11 @@ class Queue {
 class Cache {
     constructor(client) {
         // init db shit
-        this._cache = {};
-        client.database.get("SELECT * FROM songs", {}, r => {
-            for (var i in r)
-                this._cache[r[i].id] = JSON.parse(r[i].data);
-        })
+        // this._cache = {};
+        // client.database.get("SELECT * FROM songs", {}, r => {
+        //     for (var i in r)
+        //         this._cache[r[i].id] = JSON.parse(r[i].data);
+        // })
     }
 
     getInfoCache(query, client) {
@@ -109,10 +109,11 @@ class Cache {
             //         break;
             //     }
             // }
+            query = query.toLowerCase();
             client.database.get("SELECT * FROM songs WHERE `id` LIKE ?", [query], r => {
-                if (r && r[1]) {
+                if (r && r[0]) {
                     log("Found song data in database cache. Query: " + query);
-                    resolve(JSON.parse(r[1].data));
+                    resolve(JSON.parse(r[0].data));
                 } else {
                     log("No song data found in database cache. Query: " + query);
                     reject();
@@ -126,7 +127,7 @@ class Cache {
         const client = extradata.client;
         this.getInfoCache(query, client)
             .then(() => {
-                this._cache[query] = data;
+                // this._cache[query] = data;
                 log("Found data in cache for query " + query + " updating it anyway :P");
             })
             .catch(() => {
@@ -137,9 +138,12 @@ class Cache {
                 if (data.chapters) delete data.chapters;
                 if (data.storyboards) delete data.storyboards;
                 if (data.thumbnails) delete data.thumbnails;
-                this._cache[query] = data;
+                // if a song given is a raw link, use it as the id in the db
+                if (!data.spotifyInfo) query = data.video_url;
+                if (query.includes("&")) query = query.split("&")[0];
+                // this._cache[query] = data;
                 log("Saving data in songs database cache for query " + query);
-                client.database.execute("INSERT INTO songs(guild, id, data) VALUES(?, ?, ?)", [guildId, query, JSON.stringify(data)]);
+                client.database.execute("INSERT INTO songs(guild, id, data) VALUES(?, ?, ?)", [guildId, query.toLowerCase(), JSON.stringify(data)]);
             });
     }
 }
@@ -211,7 +215,16 @@ class Player {
                     log("Searching song using youtube API. The query given is a string.");
                     args.shift();
                     query = "";
-                    for (var i in args) { query += args[i] + " "; }
+                    for (var i in args) query += args[i] + " ";
+                    let r = await spotify.searchTrack(query);
+                    if (r && r[0]) r = r[0];
+                    if (r.artists) {
+                        spotifyInfo = r;
+                        query = r.name + " " + r.artists[0].name;
+                    } else {
+                        spotifyInfo = r;
+                        query = r.name;
+                    }
                 } else {
                     log("Searching song using youtube API. The query given is a link.");
                     // songInfo = await ytdl.getBasicInfo(args[1]);

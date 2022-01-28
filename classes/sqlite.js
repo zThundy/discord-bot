@@ -1,6 +1,7 @@
 import sqlite3 from "sqlite3";
 import Colors from "./colors.js";
 const colors = new Colors();
+import { log } from "./utils.js";
 
 class SQL {
     queryRetryes = 5;
@@ -27,6 +28,7 @@ class SQL {
 
     execute(query, args, cb, id = 0) {
         this.db.run(query, args, (err, r) => {
+            log(`Executing db query "${query}" with args "${args}"`);
             if (err) return this.handleErrors(id, err, "execute", query, args, cb);
             if (cb) cb(r);
         })
@@ -34,6 +36,7 @@ class SQL {
 
     get(query, args, cb, id = 0) {
         this.db.all(query, args, (err, r) => {
+            log(`Getting data from db query "${query}" with args "${args}"`);
             if (err) return this.handleErrors(id, err, "get", query, args, cb);
             if (cb) cb(r);
         })

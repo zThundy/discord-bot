@@ -20,12 +20,10 @@ export async function run(client, args, message) {
 
     // check if the song has been fetched from spotify, if yes
     // use the spotify informations insted of youtube ones
-    console.log(song.spotifyInfo)
     if (song.spotifyInfo) {
         song.title = song.spotifyInfo.name;
         if (song.spotifyInfo.album.name) song.albumName = song.spotifyInfo.album.name;
         if (song.spotifyInfo.artists && song.spotifyInfo.artists[0]) song.author.name = song.spotifyInfo.artists[0].name;
-        console.log(song.spotifyInfo.artists, song.spotifyInfo.artists[0])
     }
 
     message.react("✅")
