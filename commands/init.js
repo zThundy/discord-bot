@@ -131,6 +131,13 @@ const _initClient = (client) => {
                 if (prop && prop.botJoinedGuild) prop.botJoinedGuild(guild);
             });
         });
+        
+        if (client.config.guildWhitelist.enabled) {
+            if (!client.config.guildWhitelist.guilds.includes(guild.id)) {
+                guild.leave();
+                client.database.execute("DELETE FROM servers WHERE id = ?", [guild.id]);
+            }
+        }
         _updateStatus(client);
     });
 
