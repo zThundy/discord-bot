@@ -34,6 +34,13 @@ export default {
     // this is useful for troubleshooting if something is not working correctly
     enableLogs: true,
     
+    // guildWhitelist | this will define a whitelist of server that the bot will be inside
+    guildWhitelist: {
+        enabled: false,
+        // guilds | if the server id is not inside of this object, then the bot will leave the guild on startup
+        guilds: ["GUILD_ID_HERE", "OTHER_GUILD_ID_HERE"]
+    },
+    
     // a list of all the admins for the bot
     admins: ["YOUR_ADMIN_ID_HERE", "YOUR_OTHER_ADMIN_ID_HERE"]
 }
