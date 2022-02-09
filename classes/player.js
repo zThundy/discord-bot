@@ -93,32 +93,65 @@ class Cache {
         //     for (var i in r)
         //         this._cache[r[i].id] = JSON.parse(r[i].data);
         // })
+
+        this.linkPattern = new RegExp(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g,'i'); // fragment locator
+    }
+
+    _updateQueryString(str) {
+        if (this.linkPattern.test(str)) {
+            var query = str.split("v=");
+            if (query[0] && query[1]) {
+                query = query[1];
+                let args = query.split("&");
+                if (args[0] && args[1])
+                    query = args[0];
+                return query;
+            }
+            if (str.includes("youtu.be")) {
+                var query = str.split(".be/")
+                if (query[0] && query[1]) {
+                    query = query[1];
+                    let args = query.split("&");
+                    if (args[0] && args[1])
+                        query = args[0];
+                    return query;
+                }
+            }
+        }
+        return str;
     }
 
     getInfoCache(query, client) {
         return new Promise((resolve, reject) => {
-            // var result = null;
-            // for (var i in this._cache) {
-            //     i = i.toLowerCase();
-            //     query = query.toLowerCase();
-            //     if (i.includes(query)) {
-            //         result = this._cache[i];
-            //         break;
-            //     } else if (this._cache[i].video_url === query) {
-            //         result = this.cache[i];
-            //         break;
-            //     }
-            // }
-            query = query.toLowerCase();
-            client.database.get("SELECT * FROM songs WHERE `id` LIKE ?", [query], r => {
-                if (r && r[0]) {
-                    log("Found song data in database cache. Query: " + query);
-                    resolve(JSON.parse(r[0].data));
-                } else {
-                    log("No song data found in database cache. Query: " + query);
-                    reject();
-                }
-            });
+            try {
+                // var result = null;
+                // for (var i in this._cache) {
+                //     i = i.toLowerCase();
+                //     query = query.toLowerCase();
+                //     if (i.includes(query)) {
+                //         result = this._cache[i];
+                //         break;
+                //     } else if (this._cache[i].video_url === query) {
+                //         result = this.cache[i];
+                //         break;
+                //     }
+                // }
+                
+                query = query.toLowerCase();
+                query = this._updateQueryString(query);
+                log("Searching data in cache. Query: " + query);
+                client.database.get("SELECT * FROM songs WHERE `id` LIKE ?", [query], r => {
+                    if (r && r[0]) {
+                        log("Found song data in database cache. Query: " + query);
+                        resolve(JSON.parse(r[0].data));
+                    } else {
+                        log("No song data found in database cache. Query: " + query);
+                        reject();
+                    }
+                });
+            } catch(e) {
+                reject(e);
+            }
         });
     }
 
@@ -142,8 +175,10 @@ class Cache {
                 if (!data.spotifyInfo) query = data.video_url;
                 if (query.includes("&")) query = query.split("&")[0];
                 // this._cache[query] = data;
+                query = query.toLowerCase();
+                query = this._updateQueryString(query);
                 log("Saving data in songs database cache for query " + query);
-                client.database.execute("INSERT INTO songs(guild, id, data) VALUES(?, ?, ?)", [guildId, query.toLowerCase(), JSON.stringify(data)]);
+                client.database.execute("INSERT INTO songs(guild, id, data) VALUES(?, ?, ?)", [guildId, query, JSON.stringify(data)]);
             });
     }
 }
@@ -177,8 +212,8 @@ class Player {
     }
 
     _isSpotifyLink(link) {
-        // check first if this is a link or not
-        if (!link.includes("http")) return false;
+        // check first if the given string is even a link
+        if (!this.cache.linkPattern.test(link)) return false;
         // check if the link is from spotify
         if (!(link.includes("spotify") || link.includes("open.spotify"))) return false;
         return true;
@@ -190,8 +225,8 @@ class Player {
     }
 
     _isYoutubeLink(link) {
-        // check first if this is a link or not
-        if (!link.includes("http")) return false;
+        // check first if the given string is even a link
+        if (!this.cache.linkPattern.test(link)) return false;
         // check if the link is from youtube
         if ((!(link.includes("youtube") || link.includes("youtu")))) return false;
         return true;
@@ -236,20 +271,24 @@ class Player {
                         resolve(res);
                     })
                     .catch(async e => {
-                        if (!songInfo) {
-                            const searchResults = await ytsr(query, { limit: 1 });
-                            if (searchResults && searchResults.items)
-                                if (searchResults.items[0].url)
-                                    songInfo = await ytdl.getBasicInfo(searchResults.items[0].url);
+                        try {
+                            if (!songInfo) {
+                                const searchResults = await ytsr(query, { limit: 1 });
+                                if (searchResults && searchResults.items)
+                                    if (searchResults.items[0].url)
+                                        songInfo = await ytdl.getBasicInfo(searchResults.items[0].url);
+                            }
+                            let song = songInfo.videoDetails;
+                            if (spotifyInfo) {
+                                log("Searched query has spotify informations: adding it to song array");
+                                song.spotifyInfo = spotifyInfo;
+                            }
+                            log("Got informations for song: " + song.title);
+                            this.cache.saveInfoCache(query, song, { guild: this.message.guild.id, client: this.client });
+                            resolve(song);
+                        } catch(e) {
+                            reject(e);
                         }
-                        let song = songInfo.videoDetails;
-                        if (spotifyInfo) {
-                            log("Searched query has spotify informations: adding it to song array");
-                            song.spotifyInfo = spotifyInfo;
-                        }
-                        log("Got informations for song: " + song.title);
-                        this.cache.saveInfoCache(query, song, { guild: this.message.guild.id, client: this.client });
-                        resolve(song);
                     });
             } catch(e) { reject(e); }
         });
