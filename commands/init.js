@@ -124,7 +124,7 @@ const _initClient = (client) => {
 
     client.on("guildCreate", (guild) => {
         console.log(colors.changeColor("green", `Added in guild "${guild.name}"`))
-        client.database.execute(`INSERT INTO servers(id) VALUES(${guild.id})`, () => {
+        client.database.execute(`INSERT INTO servers(id) VALUES(${guild.id})`, {}, () => {
             paths.forEach(file => {
                 let command = file.module;
                 let prop = client.commands.get(command);
@@ -138,6 +138,20 @@ const _initClient = (client) => {
         console.log(colors.changeColor("red", `Removed from guild "${guild.name}"`))
         client.database.execute(`DELETE FROM servers WHERE id = '${guild.id}'`)
         _updateStatus(client);
+    });
+    
+    client.guilds.cache.forEach(guild => {
+        client.database.get("SELECT * FROM servers WHERE id = ?", [guild.id], r => {
+            if (!r[0]) {
+                client.database.execute("INSERT INTO servers(id, name) VALUES(?, ?)", [guild.id, guild.name]);
+            }
+        });
+        if (client.config.guildWhitelist.enabled) {
+            if (!client.config.guildWhitelist.guilds.includes(guild.id)) {
+                guild.leave();
+                client.database.execute("DELETE FROM servers WHERE id = ?", [guild.id]);
+            }
+        }
     });
 
     console.log(colors.changeColor("green", "[Info] Discord client handlers initialized"));
