@@ -100,6 +100,7 @@ class Cache {
     _updateQueryString(str) {
         if (this.linkPattern.test(str)) {
             var query = str.split("v=");
+            // check full youtube link
             if (query[0] && query[1]) {
                 query = query[1];
                 let args = query.split("&");
@@ -107,8 +108,9 @@ class Cache {
                     query = args[0];
                 return query;
             }
+            // check for short youtube link
             if (str.includes("youtu.be")) {
-                var query = str.split(".be/")
+                var query = str.split(".be/");
                 if (query[0] && query[1]) {
                     query = query[1];
                     let args = query.split("&");
@@ -124,19 +126,6 @@ class Cache {
     getInfoCache(query, client) {
         return new Promise((resolve, reject) => {
             try {
-                // var result = null;
-                // for (var i in this._cache) {
-                //     i = i.toLowerCase();
-                //     query = query.toLowerCase();
-                //     if (i.includes(query)) {
-                //         result = this._cache[i];
-                //         break;
-                //     } else if (this._cache[i].video_url === query) {
-                //         result = this.cache[i];
-                //         break;
-                //     }
-                // }
-                
                 query = query.toLowerCase();
                 query = this._updateQueryString(query);
                 log("Searching data in cache. Query: " + query);
@@ -262,7 +251,6 @@ class Player {
                     }
                 } else {
                     log("Searching song using youtube API. The query given is a link.");
-                    // songInfo = await ytdl.getBasicInfo(args[1]);
                     query = args[1];
                 }
                 this.cache.getInfoCache(query, this.client)
@@ -274,9 +262,10 @@ class Player {
                         try {
                             if (!songInfo) {
                                 const searchResults = await ytsr(query, { limit: 1 });
-                                if (searchResults && searchResults.items)
-                                    if (searchResults.items[0].url)
-                                        songInfo = await ytdl.getBasicInfo(searchResults.items[0].url);
+                                if (searchResults && searchResults.items) {
+                                    if (searchResults.results == 0) return reject("No results have been found. Maybe this is not a song?");
+                                    if (searchResults.items[0].url) songInfo = await ytdl.getBasicInfo(searchResults.items[0].url);
+                                }
                             }
                             let song = songInfo.videoDetails;
                             if (spotifyInfo) {

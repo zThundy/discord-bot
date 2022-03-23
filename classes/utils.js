@@ -20,22 +20,17 @@ export function FormatNumber(value) {
 
 export function log(message) {
     if (!config.enableLogs) return;
-    fs.readFile("log.txt", 'utf8', (err, data) => {
-        var currentdate = new Date();
-        var datetime = currentdate.getDate() + "/"
-                + (currentdate.getMonth() + 1)  + "/"
-                + currentdate.getFullYear() + " | "
-                + currentdate.getHours() + ":"
-                + currentdate.getMinutes() + ":"
-                + currentdate.getSeconds() + " @"
-        message = datetime + " " + message
-        data = data + "\n" + message
-        console.log(message)
+    var currentdate = new Date();
+    var datetime = currentdate.getDate() + "/"
+            + (currentdate.getMonth() + 1)  + "/"
+            + currentdate.getFullYear() + " | "
+            + currentdate.getHours() + ":"
+            + currentdate.getMinutes() + ":"
+            + currentdate.getSeconds() + " @"
+    message = datetime + " " + message
+    console.log(message)
 
-        fs.writeFile("log.txt", data, (err) => {
-            if (err) throw err;
-        })
-    })
+    fs.appendFileSync('log.txt', message + "\n", 'utf8');
 }
 
 export function FormatToMysql(time) {
