@@ -33,13 +33,11 @@ export async function _init(client) {
                 fs.readdir("./commands/" + file, (err, subFiles) => {
                     if (err) return console.error(err);
                     subFiles.forEach(subFile => {
-                        let path = "./" + file + "/" + subFile;
-                        RegisterCommand(client, path, subFile);
+                        RegisterCommand(client, "./" + file + "/" + subFile, subFile);
                     });
                 });
             } else {
-                let path = "./" + file;
-                RegisterCommand(client, path, file);
+                RegisterCommand(client, "./" + file, file);
             }
         });
         _initClient(client);
@@ -68,8 +66,9 @@ const _initClient = (client) => {
                     message.channel.send({ embed });
                     return;
                 }
+                // add timeout for the user
                 client.timeouts.addTimeout(message.author.id, client.config.timeouts.timeBetweenCommands);
-                // main funzion trigger
+                // main function call
                 prop.run(client, args, message);
             } else {
                 let embed = new MessageEmbed()

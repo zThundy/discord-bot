@@ -40,6 +40,7 @@ export async function run(client, args, message) {
     client.player.play(args)
         .then(message.react("✅"))
         .catch(e => {
+            console.error(e);
             let embed = new MessageEmbed()
                 .setDescription(e)
                 .setColor("#FF0000");

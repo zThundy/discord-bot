@@ -201,15 +201,14 @@ class Player {
     }
 
     _isSpotifyLink(link) {
-        // check first if the given string is even a link
-        if (!this.cache.linkPattern.test(link)) return false;
-        // check if the link is from spotify
-        if (!(link.includes("spotify") || link.includes("open.spotify"))) return false;
-        return true;
+        let regex = /(?<=https:\/\/open\.spotify\.com\/track\/)([a-zA-Z0-9]{15,})/g;
+        if (regex.test(link)) return true;
+        return false;
     }
 
     _isSpotifyPlaylist(link) {
-        if (link.includes("playlist")) return true;
+        let regex = /(?<=https:\/\/open\.spotify\.com\/playlist\/)([a-zA-Z0-9]{15,})/g;
+        if (regex.test(link)) return true;
         return false;
     }
 
@@ -221,11 +220,23 @@ class Player {
         return true;
     }
 
+    _checkLink(link) {
+        if (this._isSpotifyLink(link)) {
+            return "spotify";
+        } else if (this._isYoutubeLink(link)) {
+            return "youtube";
+        } else if (this._isSpotifyPlaylist(link)) {
+            return "splaylist";
+        }
+        return "string";
+    }
+
     _fetchInformations(args) {
         return new Promise(async (resolve, reject) => {
             try {
                 let songInfo, query, spotifyInfo;
-                if (this._isSpotifyLink(args[1])) {
+                let link = this._checkLink(args[1]);
+                if (link === "spotify") {
                     log("Searching song using spotify API. The query given is a link.");
                     query = await spotify.getTrackByURL(args[1]);
                     if (query.artists) {
@@ -235,7 +246,16 @@ class Player {
                         spotifyInfo = query;
                         query = query.name;
                     }
-                } else if (!this._isYoutubeLink(args[1])) {
+                } else if (link === "splaylist") {
+                    log("Searching song using spotify API. The query given is a playlist.");
+                    query = await spotify.getPlaylistByURL(args[1]);
+                    query = query.tracks.items;
+                    query.type = link;
+                    return resolve(query);
+                } else if (link === "youtube") {
+                    log("Searching song using youtube API. The query given is a link.");
+                    query = args[1];
+                } else if (link === "string") {
                     log("Searching song using youtube API. The query given is a string.");
                     args.shift();
                     query = "";
@@ -249,9 +269,6 @@ class Player {
                         spotifyInfo = r;
                         query = r.name;
                     }
-                } else {
-                    log("Searching song using youtube API. The query given is a link.");
-                    query = args[1];
                 }
                 this.cache.getInfoCache(query, this.client)
                     .then(res => {

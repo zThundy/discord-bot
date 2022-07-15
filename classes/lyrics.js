@@ -12,16 +12,6 @@ class Lyrics {
         this.apiRequest = { url: "", json: true };
     }
 
-    /*
-    _getShuffledArr = (arr) => {
-        const newArr = arr.slice();
-        for (let i = newArr.length - 1; i > 0; i -= i) {
-            const rand = Math.floor(Math.random() * (i + 1));
-            [newArr[i], newArr[rand]] = [newArr[rand], newArr[i]];
-        }
-        return newArr;
-    };
-    */
 
     _search(searchQuery) {
         return new Promise((resolve, reject) => {
@@ -80,7 +70,7 @@ class Lyrics {
             404: "The requested resource was not found.",
             405: "The requested method was not found.",
             500: "Ops. Something were wrong.",
-            503: "Our system is a bit busy at the moment and your request can’t be satisfied.",
+            503: "Our system is a bit busy at the moment and your request can't be satisfied.",
         }
         if (errors[code]) {
             console.log(colors.changeColor("red", "[LYRICS] Got error by musixmatch: " + errors[code]));
