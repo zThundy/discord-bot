@@ -48,8 +48,12 @@ const _initClient = (client) => {
     console.log(colors.changeColor("yellow", "[Info] Initializing discord client handlers..."));
     client.on("message", (message) => {
         if (message.author.bot) return;
+        // split the message into an array of words
         let args = message.content.split(" ");
+        // check if the first argument is a command
         if (args[0].indexOf(client.config.prefix) == -1) return;
+        // check if the command starts with the prefix
+        if (!args[0].startsWith(client.config.prefix)) return;
         // update player message every time a message is fired
         client.player.update(client, message);
         try {
