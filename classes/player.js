@@ -236,39 +236,43 @@ class Player {
             try {
                 let songInfo, query, spotifyInfo;
                 let link = this._checkLink(args[1]);
-                if (link === "spotify") {
-                    log("Searching song using spotify API. The query given is a link.");
-                    query = await spotify.getTrackByURL(args[1]);
-                    if (query.artists) {
-                        spotifyInfo = query;
-                        query = query.name + " " + query.artists[0].name;
-                    } else {
-                        spotifyInfo = query;
-                        query = query.name;
-                    }
-                } else if (link === "splaylist") {
-                    log("Searching song using spotify API. The query given is a playlist.");
-                    query = await spotify.getPlaylistByURL(args[1]);
-                    query = query.tracks.items;
-                    query.type = link;
-                    return resolve(query);
-                } else if (link === "youtube") {
-                    log("Searching song using youtube API. The query given is a link.");
-                    query = args[1];
-                } else if (link === "string") {
-                    log("Searching song using youtube API. The query given is a string.");
-                    args.shift();
-                    query = "";
-                    for (var i in args) query += args[i] + " ";
-                    let r = await spotify.searchTrack(query);
-                    if (r && r[0]) r = r[0];
-                    if (r.artists) {
-                        spotifyInfo = r;
-                        query = r.name + " " + r.artists[0].name;
-                    } else {
-                        spotifyInfo = r;
-                        query = r.name;
-                    }
+                switch(link) {
+                    case "spotify":
+                        log("Searching song using spotify API. The query given is a link.");
+                        query = await spotify.getTrackByURL(args[1]);
+                        if (query.artists) {
+                            spotifyInfo = query;
+                            query = query.name + " " + query.artists[0].name;
+                        } else {
+                            spotifyInfo = query;
+                            query = query.name;
+                        }
+                        break;
+                    case "splaylist":
+                        log("Searching song using spotify API. The query given is a playlist.");
+                        query = await spotify.getPlaylistByURL(args[1]);
+                        query = query.tracks.items;
+                        query.type = link;
+                        return resolve(query);
+                    case "youtube":
+                        log("Searching song using youtube API. The query given is a link.");
+                        query = args[1];
+                        break;
+                    case "string":
+                        log("Searching song using youtube API. The query given is a string.");
+                        args.shift();
+                        query = "";
+                        for (var i in args) query += args[i] + " ";
+                        let r = await spotify.searchTrack(query);
+                        if (r && r[0]) r = r[0];
+                        if (r.artists) {
+                            spotifyInfo = r;
+                            query = r.name + " " + r.artists[0].name;
+                        } else {
+                            spotifyInfo = r;
+                            query = r.name;
+                        }
+                        break;
                 }
                 this.cache.getInfoCache(query, this.client)
                     .then(res => {
@@ -281,7 +285,10 @@ class Player {
                                 const searchResults = await ytsr(query, { limit: 1 });
                                 if (searchResults && searchResults.items) {
                                     if (searchResults.results == 0) return reject("No results have been found. Maybe this is not a song?");
-                                    if (searchResults.items[0].url) songInfo = await ytdl.getBasicInfo(searchResults.items[0].url);
+                                    if (searchResults.items[0].url) {
+                                        log("Getting extra informations from the youtube API.");
+                                        songInfo = await ytdl.getBasicInfo(searchResults.items[0].url);
+                                    }
                                 }
                             }
                             let song = songInfo.videoDetails;
@@ -408,6 +415,7 @@ class Player {
         // check if there's something playing
         if (this.queue[this.message.guild.id].getNowplaying()) {
             const dispatcher = this.queue[this.message.guild.id].getValue("dispatcher");
+            this.queue[this.message.guild.id].setValue("loop", false);
             dispatcher.end();
             return true;
         }
