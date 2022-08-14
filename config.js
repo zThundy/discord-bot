@@ -13,7 +13,16 @@ export default {
 
     lyrics: {
         // token | Your musixmatch application token, https://developer.musixmatch.com/
-        token: "YOUR_MUSIXMATCH_TOKEN_HERE"
+        token: "YOUR_MUSIXMATCH_TOKEN_HERE",
+        // enabledWordsReplacements | if enabled, the bot will remove the words in the name of the song;
+        //                            this will help the bot to find the lyrics of the song
+        enabledWordsReplacements: true,
+        // wordsReplacements | the words that will be removed in the name of the song
+        wordsReplacements: [
+            "Nightcore",
+            "Lyrics",
+            "Lyric"
+        ]
     },
 
     musicPlayer: {
