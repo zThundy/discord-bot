@@ -42,15 +42,22 @@ class Lyrics {
                 this._search(`${this.musixmatch}${string}`)
                     .then(async res => {
                         if (!res) {
-                            var link = await this.getTrackLyricUrl(song, artist, album);
-                            if (!link) return resolve("Nothing found");
-                            link = link.split("?")[0];
-                            this._search(link)
-                                .then(res => {
-                                    if (!res) res = this._getTrackLyrics(song, artist, album);
-                                    resolve(res);
-                                })
-                                .catch(e => reject(e));
+                            this.getTrackLyricUrl(song, artist, album)
+                                .then(link => {
+                                    if (!link) {
+                                        this.getTrackLyricUrl(song)
+                                            .then(link => {
+                                                if (!link) return resolve("Nothing found");
+                                                link = link.split("?")[0];
+                                                this._search(link)
+                                                    .then(res => {
+                                                        if (!res) res = this._getTrackLyrics(song, artist, album);
+                                                        resolve(res);
+                                                    })
+                                                    .catch(e => reject(e));
+                                            });
+                                    }
+                                });
                         } else {
                             resolve(res);
                         }
@@ -121,22 +128,28 @@ class Lyrics {
 
     async getTrackLyricUrl(name, artist, album) {
         // remove everything in parentheses
-        name = name.replace(/ *\([^)]*\) */g, "");
-        this.config.wordsReplacements.forEach(word => {
-            // make everything lowercase for better search
-            let string = name.toLowerCase();
-            console.log("name 1", name);
-            console.log("string 1", string);
-            console.log("word 1", word);
-            if (string.indexOf(word) !== -1)
-                name = name.substring(string.indexOf(word.toLowerCase()), (string.indexOf(word.toLowerCase()) + word.toLowerCase().lenght), "");
-            console.log("name 2", name);
-            console.log("string 2", string);
-            console.log("word 2", word);
+        return new Promise((resolve, reject) => {
+            name = name.replace(/ *\([^)]*\)*/g, "");
+            name = name.replace("-", "");
+            this.config.wordsReplacements.forEach(word => {
+                // make everything lowercase for better search
+                let string = name.toLowerCase();
+                // if there is a word in the string, remove it
+                if (string.indexOf(word.toLowerCase()) !== -1)
+                    name = name.substring(string.indexOf(word.toLowerCase()) + word.toLowerCase().length);
+                // trim the string every time just in case
+                name = name.trim();
+            });
+            if (artist)
+                log("Getting track's " + name + " by " + artist + " url using the musixmatch api");
+            else
+                log("Getting track's " + name + " url using the musixmatch api");
+            this.getTrackInfo(name, artist, album)
+                .then(track => {
+                    log("Got track's " + name + " url using the musixmatch api (" + track.track_share_url + ")");
+                    resolve(track.track_share_url);
+                });
         });
-        log("Getting track's " + name + " by " + artist + " url using the musixmatch api");
-        const track = await this.getTrackInfo(name, artist, album);
-        return track.track_share_url;
     }
 }
 
