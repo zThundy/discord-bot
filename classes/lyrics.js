@@ -10,6 +10,7 @@ class Lyrics {
         this.link = `https://api.musixmatch.com/ws/1.1/`;
         this.key = config.token;
         this.apiRequest = { url: "", json: true };
+        this.config = config;
     }
 
 
@@ -119,8 +120,22 @@ class Lyrics {
     }
 
     async getTrackLyricUrl(name, artist, album) {
-        log("Getting track's " + name + " by " + artist + " url using the musixmatch api")
-        const track = await this.getTrackInfo(name, artist, album)
+        // remove everything in parentheses
+        name = name.replace(/ *\([^)]*\) */g, "");
+        this.config.wordsReplacements.forEach(word => {
+            // make everything lowercase for better search
+            let string = name.toLowerCase();
+            console.log("name 1", name);
+            console.log("string 1", string);
+            console.log("word 1", word);
+            if (string.indexOf(word) !== -1)
+                name = name.substring(string.indexOf(word.toLowerCase()), (string.indexOf(word.toLowerCase()) + word.toLowerCase().lenght), "");
+            console.log("name 2", name);
+            console.log("string 2", string);
+            console.log("word 2", word);
+        });
+        log("Getting track's " + name + " by " + artist + " url using the musixmatch api");
+        const track = await this.getTrackInfo(name, artist, album);
         return track.track_share_url;
     }
 }
