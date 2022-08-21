@@ -56,6 +56,13 @@ class Lyrics {
                                                     })
                                                     .catch(e => reject(e));
                                             });
+                                    } else {
+                                        this._search(link)
+                                            .then(res => {
+                                                if (!res) res = this._getTrackLyrics(song, artist, album);
+                                                resolve(res);
+                                            })
+                                            .catch(e => reject(e));
                                     }
                                 });
                         } else {
