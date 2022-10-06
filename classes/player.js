@@ -167,7 +167,7 @@ class Cache {
                 query = query.toLowerCase();
                 query = this._updateQueryString(query);
                 log("Saving data in songs database cache for query " + query);
-                client.database.execute("INSERT INTO songs(guild, id, data) VALUES(?, ?, ?)", [guildId, query, JSON.stringify(data)]);
+                client.database.execute("INSERT INTO songs(guild, id, source, data) VALUES(?, ?, ?, ?)", [guildId, query, extradata.source, JSON.stringify(data)]);
             });
     }
 }
@@ -297,7 +297,7 @@ class Player {
                                 song.spotifyInfo = spotifyInfo;
                             }
                             log("Got informations for song: " + song.title);
-                            this.cache.saveInfoCache(query, song, { guild: this.message.guild.id, client: this.client });
+                            this.cache.saveInfoCache(query, song, { guild: this.message.guild.id, client: this.client, source: link });
                             resolve(song);
                         } catch(e) {
                             reject(e);
