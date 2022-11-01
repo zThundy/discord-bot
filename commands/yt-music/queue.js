@@ -16,7 +16,7 @@ const _getQueueDescription = (songs, minIndex, maxIndex) => {
     for (var i in songs) {
         if ((Number(i) + 1) <= maxIndex && (Number(i) + 1) >= minIndex) {
             var title = (songs[i].title.length >= 40 ? songs[i].title.slice(0, 40)  + "..." : songs[i].title)
-            if (songs[i].allowRatings) {
+            if (songs[i].allowRatings && FormatNumber(songs[i].likes)) {
                 description += `[${(Number(i) + 1)}] ${title} - ${FormatNumber(songs[i].likes)} 👍\n`;
             } else {
                 description += `[${(Number(i) + 1)}] ${title} - No 👍 😢\n`;

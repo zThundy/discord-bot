@@ -361,8 +361,8 @@ class Player {
                             this.stop();
                         }
                     })
-                    .on("error", e => { console.error(e) })
-                    .on("pause", () => { console.log("stream in pause") }) ;
+                    .on("error", e => { log(e) })
+                    .on("pause", () => { log("stream in pause") }) ;
                 dispatcher.setVolume(volume);
                 this.queue[this.message.guild.id].setValue("dispatcher", dispatcher);
                 // check if there's a song looping to dequeue the first from the songs list
