@@ -7,7 +7,7 @@ import Colors from "./classes/colors.js";
 import Player from "./classes/player.js";
 import Lyrics from "./classes/lyrics.js";
 import Timeouts from "./classes/timeouts.js";
-import Interactions from "./interactions/init.js";
+// import Interactions from "./interactions/init.js";
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
