@@ -1,3 +1,10 @@
+export function getCommandInfo() {
+    return {
+        command: "help",
+        description: "Show the list of available commands 📖"
+    }
+}
+
 export async function run(client, args, message) {
     const fields = []
     var embed = {}
