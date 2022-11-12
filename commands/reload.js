@@ -7,7 +7,7 @@ export async function run(client, args, message) {
             let embed = new MessageEmbed()
                 .setDescription("Give me a module to reload 🚫")
                 .setColor("#FF0000");
-            message.channel.send({ embed });
+            message.channel.send({ embeds: [embed] });
             return;
         }
 
@@ -19,23 +19,23 @@ export async function run(client, args, message) {
                 let embed = new MessageEmbed()
                     .setDescription("Module reloaded ♻️")
                     .setColor("#00FF00");
-                message.channel.send({ embed });
+                message.channel.send({ embeds: [embed] });
             } else {
                 let embed = new MessageEmbed()
                     .setDescription("Module not found 🚫")
                     .setColor("#FF0000");
-                message.channel.send({ embed });
+                message.channel.send({ embeds: [embed] });
             }
         } catch(e) {
             let embed = new MessageEmbed()
                 .setDescription("Can't reload the module 😅")
                 .setColor("#00FF00");
-            message.channel.send({ embed });
+            message.channel.send({ embeds: [embed] });
         }
     } else {
         let embed = new MessageEmbed()
             .setDescription("Nope! 🚫")
             .setColor("#FF0000");
-        message.channel.send({ embed });
+        message.channel.send({ embeds: [embed] });
     }
 }

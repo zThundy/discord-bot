@@ -15,12 +15,12 @@ export async function run(client, args, message) {
         let embed = new MessageEmbed()
             .setDescription(string)
             .setColor("#FFFF00");
-        message.channel.send({ embed });
+        message.channel.send({ embeds: [embed] });
     } catch(e) {
         console.error(e);
         let embed = new MessageEmbed()
             .setDescription("No song playing rn 😔")
             .setColor("#FF0000");
-        message.channel.send({ embed });
+        message.channel.send({ embeds: [embed] });
     }
 }

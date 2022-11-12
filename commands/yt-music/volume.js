@@ -41,5 +41,5 @@ export async function run(client, args, message) {
     let embed = new MessageEmbed()
         .setDescription(string)
         .setColor("#FFFF00");
-    message.channel.send({ embed });
+    message.channel.send({ embeds: [embed] });
 }

@@ -34,7 +34,7 @@ const _initQueueMessage = async (client, args, message) => {
         let embed = new MessageEmbed()
             .setTitle("Queue for " + message.guild.name)
             .setDescription("```" + description + "```");
-        message.channel.send({ embed }).then(msg => {
+        message.channel.send({ embeds: [embed] }).then(msg => {
             if (songs.length < client.config.musicPlayer.queueMaxView) {
                 queueMessages[message.guild.id] = msg;
                 return;
@@ -54,7 +54,7 @@ const _initQueueMessage = async (client, args, message) => {
         let embed = new MessageEmbed()
             .setDescription("No songs in queue 😢")
             .setColor("#FF0000");
-        message.channel.send({ embed });
+        message.channel.send({ embeds: [embed] });
     }
 }
 

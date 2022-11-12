@@ -6,6 +6,9 @@ export function getCommandInfo() {
 }
 
 export async function run(client, args, message) {
+    console.log("help command executed");
+    console.log(args);
+
     const fields = []
     var embed = {}
     const commandsArgs = {}
@@ -56,5 +59,5 @@ export async function run(client, args, message) {
         }
     }
 
-    message.channel.send({ embed })
+    message.channel.send({ embeds: [embed] });
 }

@@ -18,7 +18,7 @@ export async function run(client, args, message) {
         let embed = new MessageEmbed()
             .setDescription("No song playing rn 😔")
             .setColor("#FF0000");
-        message.channel.send({ embed });
+        message.channel.send({ embeds: [embed] });
         return;
     }
 
@@ -66,5 +66,5 @@ export async function run(client, args, message) {
         ])
         .setThumbnail(song.author.thumbnails[0].url)
         .setDescription("[Youtube Link](" + song.video_url + ")");
-    message.channel.send({ embed });
+    message.channel.send({ embeds: [embed] });
 }

@@ -30,7 +30,7 @@ export async function run(client, args, message) {
         let embed = new MessageEmbed()
             .setDescription(errMessage)
             .setColor("#FF0000");
-        message.channel.send({ embed });
+        message.channel.send({ embeds: [embed] });
         return;
     }
     GetPlaylistSongs(client, args, message, voiceChannel);

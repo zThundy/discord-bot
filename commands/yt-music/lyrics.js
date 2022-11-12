@@ -15,7 +15,7 @@ export async function run(client, args, message) {
         let embed = new MessageEmbed()
             .setDescription("No song playing rn 😔")
             .setColor("#FF0000");
-        return message.channel.send({ embed });
+        return message.channel.send({ embeds: [embed] });
     }
 
     // check if the song has been fetched from spotify, if yes
@@ -33,14 +33,14 @@ export async function run(client, args, message) {
                     let embed = new MessageEmbed()
                         .setDescription(lyrics)
                         .setColor("#6600CC");
-                    message.channel.send({ embed })
+                    message.channel.send({ embeds: [embed] })
                         .catch(e => { console.error(e); });
                 })
                 .catch(e => {
                     let embed = new MessageEmbed()
                         .setDescription("There has been an error.\n\n`Trace: " + e + "`")
                         .setColor("#AA0000");
-                    message.channel.send({ embed })
+                    message.channel.send({ embeds: [embed] })
                         .catch(e => { console.error(e); });
                 });
         })

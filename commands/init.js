@@ -67,7 +67,7 @@ const _initClient = (client) => {
                     let embed = new MessageEmbed()
                         .setDescription("Give me some time to think 😧")
                         .setColor("#FFFF00");
-                    message.channel.send({ embed });
+                    message.channel.send({ embeds: [embed] });
                     return;
                 }
                 // add timeout for the user
@@ -78,7 +78,7 @@ const _initClient = (client) => {
                 let embed = new MessageEmbed()
                     .setDescription("This command does not exists 😵")
                     .setColor("#FF0000");
-                message.channel.send({ embed });
+                message.channel.send({ embeds: [embed] });
             }
         } catch (e) { console.error(e) }
     });

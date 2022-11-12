@@ -15,7 +15,7 @@ function _ElaborateQueue(client, songs, message, voiceChannel) {
                 let embed = new MessageEmbed()
                     .setDescription(e)
                     .setColor("#FF0000");
-                this.message.channel.send({ embed });
+                this.message.channel.send({ embeds: [embed] });
             });
         setTimeout(() => { _ElaborateQueue(client, songs, message, voiceChannel); }, 30 * 1000)
     } else {
@@ -53,13 +53,13 @@ export async function GetPlaylistSongs(client, args, message, voiceChannel) {
             let embed = new MessageEmbed()
                 .setDescription(errorMessage)
                 .setColor("#FF0000");
-            message.channel.send({ embed });
+            message.channel.send({ embeds: [embed] });
         }
     } catch (e) {
         console.error(e)
         let embed = new MessageEmbed()
             .setDescription("No playlist found on spotify ☹️")
             .setColor("#FF0000");
-        message.channel.send({ embed });
+        message.channel.send({ embeds: [embed] });
     }
 }
