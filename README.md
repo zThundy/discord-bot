@@ -1,4 +1,4 @@
-# DiscordJs v-12.x bot
+# DiscordJs v-13.x bot
 
 <p>
   <a href="https://github.com/zThundy/discord-bot/releases" target="_blank">
