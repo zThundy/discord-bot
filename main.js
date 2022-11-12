@@ -7,9 +7,12 @@ import Colors from "./classes/colors.js";
 import Player from "./classes/player.js";
 import Lyrics from "./classes/lyrics.js";
 import Timeouts from "./classes/timeouts.js";
-// import Interactions from "./interactions/init.js";
+import Interactions from "./interactions/init.js";
 
-const client = new Discord.Client();
+const Intents = Discord.Intents;
+const client = new Discord.Client({
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES]
+});
 client.commands = new Discord.Collection();
 client.login(config.token);
 
@@ -20,7 +23,7 @@ client.on("ready", () => {
     client.lyrics = new Lyrics(config.lyrics);
     client.player = new Player(client);
     client.timeouts = new Timeouts();
-    // client.Interactions = new Interactions(client);
+    client.Interactions = new Interactions(client);
     client.config = config;
     console.log(colors.changeBackground("green", "Bot authed successfully :)"));
     _init(client);
