@@ -4,7 +4,7 @@ import { MessageEmbed } from "discord.js";
 import { IsSpotifyPlaylist } from "../../classes/utils.js";
 
 const spotify = new Spotify(config.spotify);
-var buisy = false;
+var busy = false;
 
 function _ElaborateQueue(client, songs, message, voiceChannel) {
     if (songs && songs.length > 0) {
@@ -19,7 +19,7 @@ function _ElaborateQueue(client, songs, message, voiceChannel) {
             });
         setTimeout(() => { _ElaborateQueue(client, songs, message, voiceChannel); }, 30 * 1000)
     } else {
-        buisy = false
+        busy = false
     };
 }
 
@@ -31,12 +31,12 @@ export async function GetPlaylistSongs(client, args, message, voiceChannel) {
         if (!args[1]) {
             errorMessage = "Please specify a link 😒";
         }
-        if (buisy) {
-            errorMessage = "Please wait until the selected playlist is beeing elaborated 😒";
+        if (busy) {
+            errorMessage = "Please wait until the last playlist has finished elaborating 😒";
         }
         if (!errorMessage) {
             if (IsSpotifyPlaylist(args[1])) {
-                buisy = true;
+                busy = true;
                 const url = args[1];
                 const playlist = await spotify.getPlaylistByURL(url);
                 for (var i in playlist.tracks.items) {
