@@ -16,8 +16,6 @@ export async function run(client, args, message) {
     let newVolume = args[1];
     var oldVolume = client.player.getVolume();
 
-    console.log(args[1]);
-
     // here we check if a user is giving a new volume level; if yes
     // then we print the changing volume message
     var string;
