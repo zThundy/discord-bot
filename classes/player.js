@@ -5,6 +5,18 @@ import config from "../config.js";
 import Spotify from "./spotify.js";
 import { log } from "./utils.js";
 
+import {
+	joinVoiceChannel,
+	createAudioPlayer,
+	createAudioResource,
+	entersState,
+	StreamType,
+	AudioPlayerStatus,
+	VoiceConnectionStatus,
+} from '@discordjs/voice';
+
+import { createDiscordJSAdapter } from '../classes/adapter.js';
+
 const spotify = new Spotify(config.spotify);
 
 /**
@@ -19,7 +31,7 @@ class Queue {
         this.queue.currentMessage = null;
         this.queue.textChannel = null;
         this.queue.voiceChannel = null;
-        this.queue.dispatcher = null;
+        this.queue.resource = null;
         this.queue.loop = false;
         this.queue.nowplaying = false;
         this.queue.volume = config.musicPlayer.defaultVolume;
@@ -46,12 +58,20 @@ class Queue {
             try {
                 let voiceChannel = this._message.member.voice.channel;
                 this.queue.songs.push(song);
-                this.queue.connection = await voiceChannel.join();
+                this.queue.connection = joinVoiceChannel({
+                    channelId: voiceChannel.id,
+                    guildId: voiceChannel.guild.id,
+                    adapterCreator: createDiscordJSAdapter(voiceChannel),
+                });
+                await entersState(this.queue.connection, VoiceConnectionStatus.Ready, 30_000);
                 this.queue.currentMessage = this._message;
                 this.queue.textChannel = this._message.channel;
                 this.queue.voiceChannel = voiceChannel;
                 resolve();
-            } catch(e) { reject(e) }
+            } catch(e) {
+                this.queue.connection.destroy();
+                reject(e);
+            }
         });
     }
 
@@ -187,6 +207,8 @@ class Player {
             this.queue[guild.id] = new Queue(guild.id);
         });
         this.cache = new Cache(client);
+        this.audioPlayer = createAudioPlayer();
+        this._createEvents();
     }
 
     /**
@@ -327,51 +349,73 @@ class Player {
     }
 
     _start(args = false) {
+        // this is for first execution, so we need to start the player,
+        // the rest of the work will be done by the event in this._createEvents
         try {
             // if there's nothing playing
             if (!this.queue[this.message.guild.id].getNowplaying()) {
                 // get volume to set right amount to dispatcher
-                const volume = this.queue[this.message.guild.id].getValue("volume");
                 var song = this.queue[this.message.guild.id].getFirst();
                 // check if a song is passed as argument use it for everything
                 if (args) song = args;
+                // create resource to play
+                const resource = this._createResource(song);
+                this.audioPlayer.play(resource);
+                entersState(this.audioPlayer, AudioPlayerStatus.Playing, 5000);
                 // set nowplaying to current song
                 this.queue[this.message.guild.id].setValue("nowplaying", song);
                 const connection = this.queue[this.message.guild.id].getValue("connection");
-                log("Started playing " + song.local_link);
-                const dispatcher = connection
-                    .play(song.local_link)
-                    .on("finish", () => {
-                        // get always all the looping informations before the nowplaying is resetted
-                        const loop = this.queue[this.message.guild.id].getValue("loop");
-                        const looping = this.queue[this.message.guild.id].getValue("nowplaying");
-                        // get the first song for the queue checks: if no song is in the first position,
-                        // then stops the playback
-                        song = this.queue[this.message.guild.id].getFirst();
-                        // check if loop is true to start playback even if queue is empty
-                        if (loop) song = looping;
-                        this.queue[this.message.guild.id].setValue("nowplaying", false);
-                        if (song) {
-                            if (loop) {
-                                this._start(song);
-                            } else {
-                                this._start();
-                            }
-                        } else {
-                            this.stop();
-                        }
-                    })
-                    .on("error", e => { log(e) })
-                    .on("pause", () => { log("stream in pause") }) ;
-                dispatcher.setVolume(volume);
-                this.queue[this.message.guild.id].setValue("dispatcher", dispatcher);
-                // check if there's a song looping to dequeue the first from the songs list
-                const loop = this.queue[this.message.guild.id].getValue("loop");
-                if (!loop) this.queue[this.message.guild.id].dequeue();
+                connection.subscribe(this.audioPlayer);
             }
         } catch(e) {
             log("Error on playing song: " + e);
         }
+    }
+
+    _createResource(song) {
+        const volume = this.queue[this.message.guild.id].getValue("volume");
+        const resource = createAudioResource(song.local_link, { inputType: StreamType.Arbitrary, inlineVolume: true });
+        resource.volume.setVolume(volume);
+        this.queue[this.message.guild.id].setValue("resource", resource);
+        return resource;
+    }
+
+    _createEvents() {
+        this.audioPlayer.addListener("stateChange", (oldOne, newOne) => {
+            try {
+                log("Bot entering in state " + newOne.status);
+                // get always all the looping informations before the nowplaying is resetted
+                const loop = this.queue[this.message.guild.id].getValue("loop");
+                // get volume to set right amount to dispatcher
+                const looping = this.queue[this.message.guild.id].getValue("nowplaying");
+                // get the first song of the queue
+                var song = this.queue[this.message.guild.id].getFirst();
+                // if the bot has finished playing the music, queue the next one.
+                if (newOne.status == "idle") {
+                    // check if loop is true to start playback even if queue is empty
+                    if (loop) song = looping;
+                    this.queue[this.message.guild.id].setValue("nowplaying", false);
+                    // check if a song is in the stack
+                    if (song)
+                        this._start(loop ? song : false);
+                    else
+                        this.stop();
+                // if next song started playing, change the volume of the current stream
+                // and dequeue the song playing
+                } else if (newOne.status == "playing") {
+                    if (song) {
+                        log("Started playing " + song.local_link);
+                        // check if there's a song looping to dequeue the first from the songs list
+                        if (!loop) this.queue[this.message.guild.id].dequeue();
+                    }
+                    const volume = this.queue[this.message.guild.id].getValue("volume");
+                    const resource = this.queue[this.message.guild.id].getValue("resource");
+                    resource.volume.setVolume(volume);
+                }
+            } catch(e) {
+                log("Error on stateChange event: " + e);
+            }
+        });
     }
 
     /**
@@ -414,9 +458,8 @@ class Player {
     skip() {
         // check if there's something playing
         if (this.queue[this.message.guild.id].getNowplaying()) {
-            const dispatcher = this.queue[this.message.guild.id].getValue("dispatcher");
             this.queue[this.message.guild.id].setValue("loop", false);
-            dispatcher.end();
+            this.audioPlayer.stop();
             return true;
         }
         return false;
@@ -434,13 +477,27 @@ class Player {
         this.queue[this.message.guild.id].setValue("songs", []);
         this.queue[this.message.guild.id].setValue("loop", false);
         this.queue[this.message.guild.id].setValue("nowplaying", false);
-        const voiceChannel = this.queue[this.message.guild.id].getValue("voiceChannel");
-        voiceChannel.leave();
+        const connection = this.queue[this.message.guild.id].getValue("connection");
+        connection.destroy();
         this.queue[this.message.guild.id].setValue("connection", null);
-        this.queue[this.message.guild.id].setValue("dispatcher", null);
+        this.queue[this.message.guild.id].setValue("resource", null);
         this.queue[this.message.guild.id].setValue("textChannel", null);
         this.queue[this.message.guild.id].setValue("voiceChannel", null);
+        this.audioPlayer.stop();
     }
+
+    // pause() {
+    //     if (this.audioPlayer.state.status !== "paused") {
+    //         if (this.queue[this.message.guild.id].getNowplaying()) {
+    //             this.audioPlayer.pause();
+    //             return true;
+    //         }
+    //     } else {
+    //         this.audioPlayer.unpause();
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     nowplaying() {
         if (this.queue[this.message.guild.id].getNowplaying())
@@ -459,8 +516,8 @@ class Player {
     setVolume(volume) {
         if (this.queue[this.message.guild.id].getNowplaying()) {
             this.queue[this.message.guild.id].setValue("volume", volume);
-            const dispatcher = this.queue[this.message.guild.id].getValue("dispatcher");
-            dispatcher.setVolume(volume);
+            const resource = this.queue[this.message.guild.id].getValue("resource");
+            resource.volume.setVolume(volume);
         }
     }
 }
