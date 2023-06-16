@@ -10,6 +10,8 @@ export function getCommandInfo() {
 export async function run(client, args, message) {
     try {
         const [loop, nowplaying] = client.player.loop();
+        if (!nowplaying) throw new Error("No song playing rn 😔");
+        
         let string = `Now looping **${nowplaying.title}**`;
         if (loop) string = `Stopped looping of **${nowplaying.title}**`;
         let embed = new MessageEmbed()

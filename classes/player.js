@@ -467,8 +467,9 @@ class Player {
 
     loop() {
         // check if there's something playing
-        const loop = this.queue[this.message.guild.id].getValue("loop");
         const nowplaying = this.queue[this.message.guild.id].getNowplaying();
+        if (!nowplaying) return [false, false];
+        const loop = this.queue[this.message.guild.id].getValue("loop");
         this.queue[this.message.guild.id].setValue("loop", !loop);
         return [loop, nowplaying];
     }
