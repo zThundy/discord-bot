@@ -127,7 +127,7 @@ const _initClient = (client) => {
 
     client.on("guildCreate", (guild) => {
         console.log(colors.changeColor("green", `Added in guild "${guild.name}"`))
-        client.database.execute(`INSERT INTO servers(id) VALUES(${guild.id})`, {}, () => {
+        client.database.execute(`INSERT INTO servers(id, name) VALUES(${guild.id}, '${guild.name}')`, {}, () => {
             paths.forEach(file => {
                 let command = file.module;
                 let prop = client.commands.get(command);
