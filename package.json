@@ -4,14 +4,16 @@
   "description": "",
   "main": "main.js",
   "dependencies": {
+    "@discordjs/voice": "^0.16.0",
     "discord.js": "^12.5.1",
+    "ffmpeg-static": "^5.1.0",
     "jsdom": "^19.0.0",
     "nodemon": "^2.0.7",
     "npm": "^9.1.1",
     "opusscript": "0.0.7",
     "request-promise": "^4.2.6",
     "sqlite3": "^5.0.2",
-    "ytdl-core": "4.10.0",
+    "ytdl-core": "^4.11.4",
     "ytsr": "^3.5.3"
   },
   "scripts": {
