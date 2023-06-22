@@ -434,7 +434,7 @@ class Player {
                     // enqueue the song with all the informations
                     this.queue[this.message.guild.id].enqueue(song)
                     .then(() => {
-                        resolve();
+                        resolve(song);
                         this._start();
                     })
                     .catch(e => {

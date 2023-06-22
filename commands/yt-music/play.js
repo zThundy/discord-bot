@@ -42,7 +42,16 @@ export async function run(client, args, message) {
     }
     // QueueSong(client, args, message, voiceChannel, true);
     client.player.play(args)
-        .then(message.react("✅"))
+        .then((song) => {
+            message.react("✅");
+            let embed = new MessageEmbed()
+                .setColor("#00ff00")
+                .setTitle("Added to queue")
+                .setDescription(song.title)
+                .setThumbnail(song.thumbnail)
+                .setFooter("Requested by " + this.message.author.username, this.message.author.avatarURL());
+            message.channel.send({ embeds: [embed] });
+        })
         .catch(e => {
             console.error(e);
             let embed = new MessageEmbed()
