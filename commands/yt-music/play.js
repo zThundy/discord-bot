@@ -48,9 +48,8 @@ export async function run(client, args, message) {
                 .setColor("#00ff00")
                 .setTitle("Added to queue")
                 .setDescription(song.title)
-                .setThumbnail(song.thumbnail)
-                .setFooter("Requested by " + this.message.author.username, this.message.author.avatarURL());
-            message.channel.send({ embeds: [embed] });
+                .setFooter("Requested by " + message.author.username, message.author.avatarURL());
+            message.channel.send({ embed });
         })
         .catch(e => {
             console.error(e);
