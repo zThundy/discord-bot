@@ -1,6 +1,6 @@
 import fs from "fs";
-import ytdl from "ytdl-core";
-import ytsr from "ytsr";
+import ytdl from "@distube/ytdl-core";
+import ytsr from "@distube/ytsr";
 import config from "../config.js";
 import Spotify from "./spotify.js";
 import { log } from "./utils.js";
