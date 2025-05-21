@@ -17,10 +17,10 @@ import {
 
 import { createDiscordJSAdapter } from '../classes/adapter.js';
 
-import cookies from "../ignored/cookies.js";
-
+let cookies = fs.readFileSync("./ignored/cookies.json", "utf-8");
+cookies = JSON.parse(cookies);
+console.log(cookies);
 const agent = ytdl.createAgent(cookies);
-
 const spotify = new Spotify(config.spotify);
 
 /**
@@ -313,7 +313,7 @@ class Player {
                                     if (searchResults.results == 0) return reject("No results have been found. Maybe this is not a song?");
                                     if (searchResults.items[0].url) {
                                         log("Getting extra informations from the youtube API.");
-                                        songInfo = await ytdl.getBasicInfo(searchResults.items[0].url);
+                                        songInfo = await ytdl.getBasicInfo(searchResults.items[0].url, { agent });
                                     }
                                 }
                             }
@@ -339,7 +339,23 @@ class Player {
             try {
                 if (!fs.existsSync(link)) {
                     log("Downloading from youtube " + song.title);
-                    ytdl(song.video_url, { quality: "highestaudio", filter: "audioonly" })
+                    ytdl(song.video_url, {
+                        quality: "highestaudio",
+                        filter: "audioonly",
+                        playerClients: ["web"],
+                        quiet: true,
+                        format: "mp3",
+                        cookies: cookies,
+                        cookiefile: "./ignored/cookies.json",
+                        requestOptions: {
+                            headers: {
+                                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+                            },
+                        },
+                        requestOptions: {
+                            agent: agent,
+                        },
+                    })
                         .pipe(fs.createWriteStream(link))
                         .on("finish", () => {
                             log("Finished downloading from youtube " + song.title);

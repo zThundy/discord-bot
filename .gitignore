@@ -142,8 +142,7 @@ dist
 ### Custom Files ###
 log.txt
 .vscode/
-ignored/config.js
-ignored/cookies.js
+ignored/*.j*
 *.db
 
 
