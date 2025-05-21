@@ -4,17 +4,17 @@
   "description": "",
   "main": "main.js",
   "dependencies": {
-    "@discordjs/voice": "^0.16.0",
+    "@discordjs/voice": "^0.18.0",
+    "@distube/ytdl-core": "^4.16.10",
+    "@distube/ytsr": "^2.0.4",
     "discord.js": "^12.5.1",
-    "ffmpeg-static": "^5.1.0",
-    "jsdom": "^19.0.0",
+    "ffmpeg-static": "^5.2.0",
+    "jsdom": "^26.1.0",
     "nodemon": "^2.0.7",
     "npm": "^9.1.1",
-    "opusscript": "0.0.7",
+    "opusscript": "^0.1.1",
     "request-promise": "^4.2.6",
-    "sqlite3": "^5.0.2",
-    "ytdl-core": "^4.11.4",
-    "ytsr": "^3.5.3"
+    "sqlite3": "^5.0.2"
   },
   "scripts": {
     "dev": "nodemon main.js"
