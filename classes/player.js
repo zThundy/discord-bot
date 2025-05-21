@@ -1,21 +1,25 @@
 import fs from "fs";
 import ytdl from "@distube/ytdl-core";
 import ytsr from "@distube/ytsr";
-import config from "../config.js";
+import config from "../ignored/config.js";
 import Spotify from "./spotify.js";
 import { log } from "./utils.js";
 
 import {
-	joinVoiceChannel,
-	createAudioPlayer,
-	createAudioResource,
-	entersState,
-	StreamType,
-	AudioPlayerStatus,
-	VoiceConnectionStatus,
+    joinVoiceChannel,
+    createAudioPlayer,
+    createAudioResource,
+    entersState,
+    StreamType,
+    AudioPlayerStatus,
+    VoiceConnectionStatus,
 } from '@discordjs/voice';
 
 import { createDiscordJSAdapter } from '../classes/adapter.js';
+
+import cookies from "../ignored/cookies.js";
+
+const agent = ytdl.createAgent(cookies);
 
 const spotify = new Spotify(config.spotify);
 
@@ -68,7 +72,7 @@ class Queue {
                 this.queue.textChannel = this._message.channel;
                 this.queue.voiceChannel = voiceChannel;
                 resolve();
-            } catch(e) {
+            } catch (e) {
                 this.queue.connection.destroy();
                 reject(e);
             }
@@ -114,7 +118,7 @@ class Cache {
         //         this._cache[r[i].id] = JSON.parse(r[i].data);
         // })
 
-        this.linkPattern = new RegExp(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g,'i'); // fragment locator
+        this.linkPattern = new RegExp(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g, 'i'); // fragment locator
     }
 
     _updateQueryString(str) {
@@ -158,7 +162,7 @@ class Cache {
                         reject();
                     }
                 });
-            } catch(e) {
+            } catch (e) {
                 reject(e);
             }
         });
@@ -258,7 +262,7 @@ class Player {
             try {
                 let songInfo, query, spotifyInfo;
                 let link = this._checkLink(args[1]);
-                switch(link) {
+                switch (link) {
                     case "spotify":
                         log("Searching song using spotify API. The query given is a link.");
                         query = await spotify.getTrackByURL(args[1]);
@@ -321,11 +325,11 @@ class Player {
                             log("Got informations for song: " + song.title);
                             this.cache.saveInfoCache(query, song, { guild: this.message.guild.id, client: this.client, source: link });
                             resolve(song);
-                        } catch(e) {
+                        } catch (e) {
                             reject(e);
                         }
                     });
-            } catch(e) { reject(e); }
+            } catch (e) { reject(e); }
         });
     }
 
@@ -344,7 +348,7 @@ class Player {
                 } else {
                     resolve(link);
                 }
-            } catch(e) { reject(e); }
+            } catch (e) { reject(e); }
         })
     }
 
@@ -367,7 +371,7 @@ class Player {
                 const connection = this.queue[this.message.guild.id].getValue("connection");
                 connection.subscribe(this.audioPlayer);
             }
-        } catch(e) {
+        } catch (e) {
             log("Error on playing song: " + e);
         }
     }
@@ -400,8 +404,8 @@ class Player {
                         this._start(loop ? song : false);
                     else
                         this.stop();
-                // if next song started playing, change the volume of the current stream
-                // and dequeue the song playing
+                    // if next song started playing, change the volume of the current stream
+                    // and dequeue the song playing
                 } else if (newOne.status == "playing") {
                     if (song) {
                         log("Started playing " + song.local_link);
@@ -412,7 +416,7 @@ class Player {
                     const resource = this.queue[this.message.guild.id].getValue("resource");
                     resource.volume.setVolume(volume);
                 }
-            } catch(e) {
+            } catch (e) {
                 log("Error on stateChange event: " + e);
             }
         });
@@ -425,33 +429,33 @@ class Player {
         return new Promise((resolve, reject) => {
             // start downloading the first song of the queue
             this._fetchInformations(args)
-            .then(song => {
-                // download song found by the youtube search query
-                this._downloadFirst(song)
-                .then(local_link => {
-                    // save the local generated link
-                    song.local_link = local_link;
-                    // enqueue the song with all the informations
-                    this.queue[this.message.guild.id].enqueue(song)
-                    .then(() => {
-                        resolve(song);
-                        this._start();
-                    })
-                    .catch(e => {
-                        let string;
-                        switch(e) {
-                            case "no-song-queued":
-                                string = "No song currently queued";
-                                break;
-                            default:
-                                string = "There has been an error. Please try again later\n\n`Trace: " + e + "`";
-                        }
-                        
-                        log(string);
-                        reject(e);
-                    });
+                .then(song => {
+                    // download song found by the youtube search query
+                    this._downloadFirst(song)
+                        .then(local_link => {
+                            // save the local generated link
+                            song.local_link = local_link;
+                            // enqueue the song with all the informations
+                            this.queue[this.message.guild.id].enqueue(song)
+                                .then(() => {
+                                    resolve(song);
+                                    this._start();
+                                })
+                                .catch(e => {
+                                    let string;
+                                    switch (e) {
+                                        case "no-song-queued":
+                                            string = "No song currently queued";
+                                            break;
+                                        default:
+                                            string = "There has been an error. Please try again later\n\n`Trace: " + e + "`";
+                                    }
+
+                                    log(string);
+                                    reject(e);
+                                });
+                        }).catch(e => reject(e));
                 }).catch(e => reject(e));
-            }).catch(e => reject(e));
         })
     }
 

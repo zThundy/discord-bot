@@ -141,8 +141,10 @@ dist
 
 ### Custom Files ###
 log.txt
-config.js
 .vscode/
+ignored/config.js
+ignored/cookies.js
 *.db
+
 
 # End of https://www.toptal.com/developers/gitignore/api/node,audio

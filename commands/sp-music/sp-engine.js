@@ -1,4 +1,4 @@
-import config from "../../config.js";
+import config from "../../ignored/config.js";
 import Spotify from "../../classes/spotify.js";
 import { MessageEmbed } from "discord.js";
 import { IsSpotifyPlaylist } from "../../classes/utils.js";

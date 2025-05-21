@@ -1,6 +1,6 @@
 import Discord from "discord.js";
 import { _init } from "./commands/init.js";
-import config from "./config.js";
+import config from "./ignored/config.js";
 // custom classes import
 import SQL from "./classes/sqlite.js";
 import Colors from "./classes/colors.js";

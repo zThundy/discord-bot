@@ -1,6 +1,6 @@
 import { MakeID } from "./utils.js";
 import Colors from "./colors.js";
-import config from "../config.js";
+import config from "../ignored/config.js";
 const colors = new Colors();
 
 class Timeouts {

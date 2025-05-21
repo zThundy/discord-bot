@@ -1,3 +1,6 @@
+
+// MOVE THIS TO /ignored FOLDER
+
 export default {
     prefix: "!!",
 
